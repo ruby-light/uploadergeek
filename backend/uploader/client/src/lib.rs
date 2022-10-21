@@ -1,4 +1,7 @@
-use canister_client_macros::*;
+mod macros;
+pub mod operations;
+
+use macros::*;
 use uploader_canister::*;
 
 // Queries

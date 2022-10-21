@@ -19,7 +19,7 @@ pub async fn install_wasm_over_uploader(
         .await
         .unwrap_or_else(|error| panic!("{}", error));
 
-    match uploader_canister_client::install_wasm(
+    match crate::install_wasm(
         agent,
         uploader_canister_id,
         &InstallWasmArgs {
@@ -48,7 +48,7 @@ pub async fn upgrade_wasm_over_uploader(
         .await
         .unwrap_or_else(|error| panic!("{}", error));
 
-    match uploader_canister_client::upgrade_wasm(
+    match crate::upgrade_wasm(
         agent,
         uploader_canister_id,
         &UpgradeWasmArgs {
@@ -69,7 +69,7 @@ pub async fn upgrade_wasm_over_uploader(
 pub async fn put_wasm_to_uploader(agent: &Agent, uploader_canister_id: &Principal, wasm: Vec<u8>) -> Result<String, String> {
     println!("Start wasm uploading");
 
-    uploader_canister_client::start_wasm_uploading(agent, uploader_canister_id, &StartWasmUploadArgs {})
+    crate::start_wasm_uploading(agent, uploader_canister_id, &StartWasmUploadArgs {})
         .await
         .map_err(|error| format!("Error while start wasm upload: {:?}", error))?;
 
@@ -79,7 +79,7 @@ pub async fn put_wasm_to_uploader(agent: &Agent, uploader_canister_id: &Principa
 
         println!("Put wasm cnunk [{}..{}]", from, to);
 
-        match uploader_canister_client::put_wasm_chunk(
+        match crate::put_wasm_chunk(
             agent,
             uploader_canister_id,
             &PutWasmChunkArgs {
@@ -100,16 +100,11 @@ pub async fn put_wasm_to_uploader(agent: &Agent, uploader_canister_id: &Principa
 
     println!("End wasm uploading");
 
-    let hash = match uploader_canister_client::end_wasm_uploading(
-        agent,
-        uploader_canister_id,
-        &EndWasmUploadArgs { wasm_hash: hash.clone() },
-    )
-    .await
-    {
-        Ok(EndWasmUploadResponse::Ok) => Ok(hash),
-        response => Err(format!("Error while end wasm upload: {:?}", response)),
-    }?;
+    let hash =
+        match crate::end_wasm_uploading(agent, uploader_canister_id, &EndWasmUploadArgs { wasm_hash: hash.clone() }).await {
+            Ok(EndWasmUploadResponse::Ok) => Ok(hash),
+            response => Err(format!("Error while end wasm upload: {:?}", response)),
+        }?;
 
     println!("Wasm uploaded with hash: {}", &hash);
 

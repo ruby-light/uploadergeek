@@ -5,10 +5,9 @@ use uploader_canister::set_service_principals::*;
 
 #[update(guard = "caller_is_service_principal")]
 fn set_service_principals(args: Args) -> Response {
-    ic_cdk::print(format!("Set service principals: {:?}", &args.service_principals
-        .iter()
-        .map(|p| p.to_text())
-        .collect::<Vec<String>>()
+    ic_cdk::print(format!(
+        "Set service principals: {:?}",
+        &args.service_principals.iter().map(|p| p.to_text()).collect::<Vec<String>>()
     ));
 
     mutate_state(|state| {

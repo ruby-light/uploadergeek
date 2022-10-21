@@ -1,6 +1,6 @@
+use crate::generate_c2c_call;
 use crate::management::install_code::InstallMode;
 use candid::Principal;
-use canister_client_macros::generate_c2c_call;
 
 pub(crate) async fn install_canister_code(canister_id: Principal, module: Vec<u8>, arg: Vec<u8>) -> Result<(), String> {
     let args = install_code::Args {

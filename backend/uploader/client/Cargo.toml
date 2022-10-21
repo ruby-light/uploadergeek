@@ -2,11 +2,17 @@
 name = "uploader_canister_client"
 version = "0.1.0"
 edition = "2021"
+description = "A tool for Internet Computer to install and upgrade big wasm module."
+license = "MIT"
+repository = "https://github.com/ruby-light/uploadergeek.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 uploader_canister = { path = "../api" }
-canister_client_macros = { path = "../../../libraries/canister_client_macros", features = ["ingress"] }
 candid = "0.8.3"
 ic-agent = "0.22.0"
+ic-utils = "0.22.0"
+garcon = "0.2.3"
+dirs = "4.0.0"
+sha2 = "0.10.6"

@@ -1,7 +1,7 @@
 {
   "canisters": {
     "uploader": {
-      "candid": "backend/canisters/uploader/api/can.did",
+      "candid": "backend/uploader/api/can.did",
       "package": "uploader_canister_impl",
       "type": "rust"
     }

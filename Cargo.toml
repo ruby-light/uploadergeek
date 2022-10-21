@@ -1,11 +1,8 @@
 [workspace]
 members = [
-    "backend/canisters/uploader/api",
-    "backend/canisters/uploader/impl",
-    "backend/libraries/canister_client",
-    "backend/libraries/canister_state_macros",
-    "backend/libraries/canister_client_macros",
-    "backend/libraries/candid_gen",
+    "backend/uploader/api",
+    "backend/uploader/client",
+    "backend/uploader/impl",
 ]
 
 [profile.release]
