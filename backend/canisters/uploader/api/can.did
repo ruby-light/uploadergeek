@@ -1,0 +1,50 @@
+type EndWasmUploadArgs = record { wasm_hash : text };
+type EndWasmUploadError = variant { WrongState; WrongHash };
+type EndWasmUploadResponse = variant { Ok; Err : EndWasmUploadError };
+type GetServicePrincipalsResponse = variant { Ok : GetServicePrincipalsResult };
+type GetServicePrincipalsResult = record { service_principals : vec principal };
+type GetUploadedWasmError = variant { WrongState };
+type GetUploadedWasmResponse = variant {
+  Ok : GetUploadedWasmResult;
+  Err : GetUploadedWasmError;
+};
+type GetUploadedWasmResult = record { len : nat64; wasm_hash : text };
+type InstallWasmArgs = record {
+  arg : vec nat8;
+  canister_id : principal;
+  wasm_hash : text;
+};
+type InstallWasmError = variant {
+  WrongState;
+  InstallError : record { reason : text };
+  WrongHash;
+};
+type InstallWasmResponse = variant { Ok; Err : InstallWasmError };
+type PutWasmChunkArgs = record { chunk : vec nat8 };
+type PutWasmChunkError = variant { WrongState };
+type PutWasmChunkResponse = variant { Ok; Err : PutWasmChunkError };
+type SetServicePrincipalError = variant { Inconsistency };
+type SetServicePrincipalResponse = variant {
+  Ok;
+  Err : SetServicePrincipalError;
+};
+type SetServicePrincipalsArgs = record { service_principals : vec principal };
+type StartWasmUploadResponse = variant { Ok };
+type UpgradeWasmError = variant {
+  WrongState;
+  WrongHash;
+  UpgradeError : record { reason : text };
+};
+type UpgradeWasmResponse = variant { Ok; Err : UpgradeWasmError };
+service : {
+  end_wasm_uploading : (EndWasmUploadArgs) -> (EndWasmUploadResponse);
+  get_service_principals : (record {}) -> (GetServicePrincipalsResponse) query;
+  get_uploaded_wasm : (record {}) -> (GetUploadedWasmResponse) query;
+  install_wasm : (InstallWasmArgs) -> (InstallWasmResponse);
+  put_wasm_chunk : (PutWasmChunkArgs) -> (PutWasmChunkResponse);
+  set_service_principals : (SetServicePrincipalsArgs) -> (
+      SetServicePrincipalResponse,
+    );
+  start_wasm_uploading : (record {}) -> (StartWasmUploadResponse);
+  upgrade_wasm : (InstallWasmArgs) -> (UpgradeWasmResponse);
+}

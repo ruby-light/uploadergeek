@@ -1,0 +1,16 @@
+[package]
+name = "canister_client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+uploader_canister = { path = "../../canisters/uploader/api" }
+uploader_canister_client = { path = "../../canisters/uploader/client" }
+candid = "0.8.3"
+dirs = "4.0.0"
+garcon = "0.2.3"
+ic-agent = "0.22.0"
+ic-utils = "0.22.0"
+sha2 = "0.10.6"

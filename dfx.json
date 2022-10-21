@@ -1,0 +1,34 @@
+{
+  "canisters": {
+    "uploader": {
+      "candid": "backend/canisters/uploader/api/can.did",
+      "package": "uploader_canister_impl",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": ""
+    }
+  },
+  "dfx": "0.11.2",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "providers": [
+        "https://ic0.app/"
+      ],
+      "type": "persistent"
+    },
+    "ic_test": {
+      "providers": [
+        "https://ic0.app/"
+      ],
+      "type": "persistent"
+    }
+  },
+  "version": 1
+}
