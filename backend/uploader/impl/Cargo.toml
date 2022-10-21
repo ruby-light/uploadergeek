@@ -13,7 +13,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-uploader_canister = { path = "../api" }
+uploader_canister = "0.1.0"
 candid = "0.8.3"
 serde = "1.0.146"
 rmp-serde = "1.1.0"
