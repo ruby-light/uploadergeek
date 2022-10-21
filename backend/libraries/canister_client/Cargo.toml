@@ -1,7 +1,10 @@
 [package]
-name = "canister_client"
+name = "uploadergeek_client"
 version = "0.1.0"
 edition = "2021"
+description = "A tool for Internet Computer to install and upgrade big wasm module."
+license = "MIT"
+repository = "https://github.com/ruby-light/uploadergeek.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
