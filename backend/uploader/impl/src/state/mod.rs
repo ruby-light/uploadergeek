@@ -9,7 +9,11 @@ impl CanisterState {
         Self { model }
     }
 
-    pub fn is_caller_is_service_principal(&self) -> bool {
+    pub fn caller_is_service_principal(&self) -> bool {
         self.model.is_service_principal(&ic_cdk::caller())
+    }
+
+    pub fn caller_is_geek_user(&self) -> bool {
+        self.model.is_geek_user(&ic_cdk::caller())
     }
 }

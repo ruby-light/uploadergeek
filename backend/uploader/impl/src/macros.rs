@@ -55,3 +55,14 @@ macro_rules! generate_c2c_call {
         }
     };
 }
+
+#[macro_export]
+macro_rules! log_info {
+    ($($arg:tt)*) => {{
+        let message = format!($($arg)*);
+        let message = format!("INFO {message}");
+        canistergeek_ic_rust::logger::log_message(message.clone());
+        canistergeek_ic_rust::monitor::collect_metrics();
+        // ic_cdk::print(message);
+    }}
+}

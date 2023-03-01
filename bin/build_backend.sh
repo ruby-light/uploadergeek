@@ -15,3 +15,6 @@ cargo fmt
 
 echo -e "${WC}4. cargo test${NC}"
 cargo test --lib
+
+echo -e "${WC}5. generate candid${NC}"
+./bin/generate-candids.sh

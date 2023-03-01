@@ -5,6 +5,7 @@ use std::collections::HashSet;
 #[derive(Serialize, Deserialize, Default)]
 pub struct DataModel {
     service_principals: HashSet<Principal>,
+    geek_user_principals: HashSet<Principal>,
     uploading_wasm: Option<Vec<u8>>,
     uploaded_wasm: Option<UploadedWasm>,
 }
@@ -27,6 +28,19 @@ impl DataModel {
 
     pub(crate) fn is_service_principal(&self, principal: &Principal) -> bool {
         self.service_principals.is_empty() || self.service_principals.contains(principal)
+    }
+
+    pub(crate) fn set_geek_user_principals(&mut self, principals: Vec<Principal>) {
+        self.geek_user_principals.clear();
+        self.geek_user_principals.extend(principals);
+    }
+
+    pub(crate) fn get_geek_user_principals(&self) -> &HashSet<Principal> {
+        &self.geek_user_principals
+    }
+
+    pub(crate) fn is_geek_user(&self, principal: &Principal) -> bool {
+        self.geek_user_principals.is_empty() || self.geek_user_principals.contains(principal)
     }
 
     pub(crate) fn start_wasm_upload(&mut self) {

@@ -12,7 +12,7 @@ pub fn read_file_from_local_bin(file_name: &str) -> Vec<u8> {
         PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("Failed to read CARGO_MANIFEST_DIR env variable"));
 
     file_path.push("local-bin");
-    file_path.push(&file_name);
+    file_path.push(file_name);
 
     let mut file = File::open(&file_path).unwrap_or_else(|_| panic!("Failed to open file: {}", file_path.to_str().unwrap()));
 

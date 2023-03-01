@@ -1,11 +1,9 @@
+use crate::EmptyArgs;
 use candid::CandidType;
 use serde::Deserialize;
 
-pub type Args = GetUploadedWasmArgs;
+pub type Args = EmptyArgs;
 pub type Response = GetUploadedWasmResponse;
-
-#[derive(CandidType, Deserialize, Debug)]
-pub struct GetUploadedWasmArgs {}
 
 #[derive(CandidType, Deserialize, Debug)]
 pub enum GetUploadedWasmResponse {

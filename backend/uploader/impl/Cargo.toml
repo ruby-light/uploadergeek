@@ -1,6 +1,6 @@
 [package]
 name = "uploader_canister_impl"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A tool for Internet Computer to install and upgrade big wasm module."
 license = "MIT"
@@ -13,7 +13,8 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-uploader_canister = "0.1.0"
+canistergeek_ic_rust = "0.3.1"
+uploader_canister = "0.1.1"
 candid = "0.8.3"
 serde = "1.0.146"
 rmp-serde = "1.1.0"

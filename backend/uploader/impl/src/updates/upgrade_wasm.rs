@@ -1,6 +1,6 @@
 use crate::guards::caller_is_service_principal;
 use crate::management::upgrade_canister_code;
-use crate::read_state;
+use crate::{log_info, read_state};
 use ic_cdk_macros::update;
 use uploader_canister::upgrade_wasm::*;
 
@@ -13,11 +13,11 @@ async fn upgrade_wasm(args: Args) -> Response {
 }
 
 async fn upgrade_wasm_int(args: Args) -> Result<(), UpgradeWasmError> {
-    ic_cdk::print(format!(
+    log_info!(
         "Upgrade wasm, hash: {}, canister: {}",
         args.wasm_hash,
         args.canister_id.to_text()
-    ));
+    );
 
     let wasm = read_state(|state| {
         let uploaded_wasm = state.model.get_uploaded_wasm().ok_or(UpgradeWasmError::WrongState)?;

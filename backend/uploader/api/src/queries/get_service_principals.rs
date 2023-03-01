@@ -1,11 +1,9 @@
+use crate::EmptyArgs;
 use candid::{CandidType, Principal};
 use serde::Deserialize;
 
-pub type Args = GetServicePrincipalsArgs;
+pub type Args = EmptyArgs;
 pub type Response = GetServicePrincipalsResponse;
-
-#[derive(CandidType, Deserialize, Debug)]
-pub struct GetServicePrincipalsArgs {}
 
 #[derive(CandidType, Deserialize, Debug)]
 pub enum GetServicePrincipalsResponse {

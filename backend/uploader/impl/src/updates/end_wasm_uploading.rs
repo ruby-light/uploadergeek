@@ -1,12 +1,12 @@
 use crate::guards::caller_is_service_principal;
-use crate::mutate_state;
+use crate::{log_info, mutate_state};
 use ic_cdk_macros::update;
 use sha2::{Digest, Sha256};
 use uploader_canister::end_wasm_uploading::*;
 
 #[update(guard = "caller_is_service_principal")]
 fn end_wasm_uploading(args: Args) -> Response {
-    ic_cdk::print(format!("End wasm uploading, hash: {}", args.wasm_hash));
+    log_info!("End wasm uploading, hash: {}", args.wasm_hash);
 
     mutate_state(|state| match state.model.get_uploading_wasm() {
         None => Response::Err(EndWasmUploadError::WrongState),

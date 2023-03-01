@@ -3,6 +3,7 @@ members = [
     "backend/uploader/api",
     "backend/uploader/client",
     "backend/uploader/impl",
+    "backend/generate_candid",
 ]
 
 [profile.release]

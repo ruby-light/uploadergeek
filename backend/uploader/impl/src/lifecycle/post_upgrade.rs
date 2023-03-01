@@ -1,4 +1,4 @@
-use crate::init_state;
+use crate::{init_state, log_info};
 use crate::lifecycle::pre_upgrade::StateVersion;
 use crate::model::DataModel;
 use crate::serializer::deserialize;
@@ -11,10 +11,18 @@ fn post_upgrade() {
 
     match version {
         StateVersion::V1 => {
-            let (model, _messages): (DataModel, String) = deserialize(&bytes).unwrap();
+            let (model, logger_stable_data, monitor_stable_data): (
+                DataModel,
+                canistergeek_ic_rust::logger::PostUpgradeStableData,
+                canistergeek_ic_rust::monitor::PostUpgradeStableData,
+            ) = deserialize(&bytes).unwrap();
+
             init_state(CanisterState::new(model));
+
+            canistergeek_ic_rust::monitor::post_upgrade_stable_data(monitor_stable_data);
+            canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
     };
 
-    ic_cdk::print("Post-upgrade completed!");
+    log_info!("Post-upgrade completed!");
 }

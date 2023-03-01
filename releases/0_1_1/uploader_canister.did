@@ -148,21 +148,21 @@ type UpgradeWasmResponse = variant { Ok; Err : UpgradeWasmError };
 service : {
   end_wasm_uploading : (EndWasmUploadArgs) -> (EndWasmUploadResponse);
   getCanistergeekInformation : (GetInformationRequest) -> (
-      opt GetInformationResponse,
-    ) query;
+  opt GetInformationResponse,
+  ) query;
   get_geek_user_principals : (record {}) -> (
-      GetGeekUserPrincipalsResponse,
-    ) query;
+  GetGeekUserPrincipalsResponse,
+  ) query;
   get_service_principals : (record {}) -> (GetServicePrincipalsResponse) query;
   get_uploaded_wasm : (record {}) -> (GetUploadedWasmResponse) query;
   install_wasm : (InstallWasmArgs) -> (InstallWasmResponse);
   put_wasm_chunk : (PutWasmChunkArgs) -> (PutWasmChunkResponse);
   set_geek_user_principals : (SetGeekUserPrincipalsArgs) -> (
-      SetGeekUserPrincipalResponse,
-    );
+  SetGeekUserPrincipalResponse,
+  );
   set_service_principals : (SetServicePrincipalsArgs) -> (
-      SetServicePrincipalResponse,
-    );
+  SetServicePrincipalResponse,
+  );
   start_wasm_uploading : (record {}) -> (StartWasmUploadResponse);
   updateCanistergeekInformation : (UpdateInformationRequest) -> ();
   upgrade_wasm : (InstallWasmArgs) -> (UpgradeWasmResponse);
