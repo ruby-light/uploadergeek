@@ -1,8 +1,8 @@
-use crate::{init_state, log_info};
 use crate::lifecycle::pre_upgrade::StateVersion;
 use crate::model::DataModel;
 use crate::serializer::deserialize;
 use crate::state::CanisterState;
+use crate::{init_state, log_info};
 use ic_cdk_macros::post_upgrade;
 
 #[post_upgrade]
