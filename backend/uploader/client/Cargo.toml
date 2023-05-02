@@ -1,6 +1,6 @@
 [package]
 name = "uploader_canister_client"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "A tool for Internet Computer to install and upgrade big wasm module."
 license = "MIT"

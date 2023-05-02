@@ -16,7 +16,7 @@ pub fn get_secp256k1_identity(name: &str) -> Secp256k1Identity {
     Secp256k1Identity::from_pem_file(pem_file_path).expect("Failed to create identity")
 }
 
-pub fn get_dfx_identity_from_pem_content(pem_content: Vec<u8>) -> Result<Box<dyn ic_agent::Identity>, String> {
+pub fn get_dfx_identity_from_pem_content(pem_content: Vec<u8>) -> Result<Box<dyn Identity>, String> {
     let pem = pem::parse(pem_content).map_err(|_| "Can not parse pem file".to_string())?;
     match pem.tag() {
         "EC PRIVATE KEY" => {
@@ -33,7 +33,7 @@ pub fn get_dfx_identity_from_pem_content(pem_content: Vec<u8>) -> Result<Box<dyn
     }
 }
 
-pub async fn build_ic_agent<I: 'static + Identity>(url: String, identity: I) -> Agent {
+pub async fn build_ic_agent(url: String, identity: Box<dyn Identity>) -> Agent {
     let mainnet = is_mainnet(&url);
     let transport = ReqwestHttpReplicaV2Transport::create(url).expect("Failed to create Reqwest transport");
 
@@ -41,7 +41,7 @@ pub async fn build_ic_agent<I: 'static + Identity>(url: String, identity: I) -> 
 
     let agent = Agent::builder()
         .with_transport(transport)
-        .with_identity(identity)
+        .with_boxed_identity(identity)
         .with_ingress_expiry(Some(timeout))
         .build()
         .expect("Failed to build IC agent");
