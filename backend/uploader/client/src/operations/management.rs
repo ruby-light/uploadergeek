@@ -14,7 +14,7 @@ pub async fn create_empty_canister(management_canister: &ManagementCanister<'_>)
     let (canister_id,) = management_canister
         .create_canister()
         .as_provisional_create_with_amount(Some(ONE_HUNDRED_TRILLION))
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
         .expect("Failed to create canister");
 
@@ -30,7 +30,7 @@ pub async fn install_wasm<A: CandidType + Sync + Send>(
     management_canister
         .install_code(canister_id, wasm_bytes)
         .with_arg(init_args)
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
         .expect("Failed to install wasm");
 }
@@ -44,7 +44,7 @@ pub async fn upgrade_wasm<A: CandidType + Send + Sync>(
     println!("Stopping canister {}", canister_id);
     management_canister
         .stop_canister(canister_id)
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
         .expect("Failed to stop canister");
     println!("Canister stopped");
@@ -54,7 +54,7 @@ pub async fn upgrade_wasm<A: CandidType + Send + Sync>(
         .install_code(canister_id, wasm_bytes)
         .with_mode(InstallMode::Upgrade)
         .with_arg(args)
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
     {
         Ok(_) => println!("Wasm upgraded"),
@@ -64,7 +64,7 @@ pub async fn upgrade_wasm<A: CandidType + Send + Sync>(
     println!("Starting canister {}", canister_id);
     management_canister
         .start_canister(canister_id)
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
         .expect("Failed to start canister");
     println!("Canister started");
@@ -73,15 +73,7 @@ pub async fn upgrade_wasm<A: CandidType + Send + Sync>(
 pub async fn uninstall_wasm(management_canister: &ManagementCanister<'_>, canister_id: &Principal) {
     management_canister
         .uninstall_code(canister_id)
-        .call_and_wait(delay())
+        .call_and_wait()
         .await
         .expect("Failed to uninstall wasm");
-}
-
-// How `Agent` is instructed to wait for update calls.
-pub fn delay() -> garcon::Delay {
-    garcon::Delay::builder()
-        .throttle(std::time::Duration::from_millis(500))
-        .timeout(std::time::Duration::from_secs(60 * 5))
-        .build()
 }
