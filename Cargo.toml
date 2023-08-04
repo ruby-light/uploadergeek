@@ -1,9 +1,12 @@
 [workspace]
 members = [
-    "backend/uploader/api",
-    "backend/uploader/client",
-    "backend/uploader/impl",
-    "backend/generate_candid",
+    "backend/canisters/uploader/api",
+    "backend/canisters/uploader/client",
+    "backend/canisters/uploader/impl",
+    "backend/generate_candid/uploader",
+    "backend/canisters/governance/api",
+    "backend/canisters/governance/impl",
+    "backend/generate_candid/governance",
 ]
 
 [profile.release]
