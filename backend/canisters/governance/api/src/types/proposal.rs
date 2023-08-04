@@ -30,7 +30,8 @@ pub enum PerformResult {
     Done,
     CallResponse {
         response: Vec<u8>,
-        candid: Result<String, String>,
+        candid: Option<String>,
+        error: Option<String>,
     },
     Error {
         reason: String,
@@ -81,5 +82,5 @@ pub struct CallCanister {
     pub method: String,
     pub argument_candid: String,
     pub payment: Option<u64>,
-    pub response_candid: String,
+    pub canister_did: Option<String>,
 }

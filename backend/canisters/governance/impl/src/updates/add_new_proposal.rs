@@ -119,6 +119,6 @@ fn validate_perform_call(perform_call: &CallCanister) -> Result<(), String> {
 
 pub(crate) fn parse_candid(candid: &str) -> Result<Vec<u8>, String> {
     let map_error = |e| format!("can not parse candid: {e:?}");
-    let args = IDLArgs::from_bytes(candid.as_bytes()).map_err(map_error)?;
+    let args: IDLArgs = candid.parse().map_err(map_error)?;
     args.to_bytes().map_err(map_error)
 }

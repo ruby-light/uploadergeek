@@ -2,6 +2,7 @@ use crate::guards::caller_is_governance_user;
 use crate::time::get_unix_epoch_time_millis;
 use crate::updates::add_new_proposal::parse_candid;
 use crate::{log_error, log_info, mutate_state, read_state};
+use candid::{check_prog, IDLArgs, IDLProg, TypeEnv};
 use governance_canister::perform_proposal::*;
 use governance_canister::types::{
     CallCanister, PerformResult, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,
@@ -87,7 +88,7 @@ async fn perform_proposal_task(proposal_detail: &ProposalDetail) -> PerformResul
             Err(reason) => PerformResult::Error { reason },
         },
         ProposalDetail::CallCanister { task } => match perform_canister_call(task).await {
-            Ok(raw_response) => decode_call_response(&task.response_candid, raw_response),
+            Ok(raw_response) => decode_call_response(&task.canister_did, &task.method, raw_response),
             Err(reason) => PerformResult::Error { reason },
         },
     }
@@ -130,10 +131,170 @@ async fn perform_canister_call(task: &CallCanister) -> Result<Vec<u8>, String> {
         .map_err(|error| format!("error while perform canister call: {error:?}"))
 }
 
-fn decode_call_response(candid: &String, raw: Vec<u8>) -> PerformResult {
-    // todo
-    PerformResult::CallResponse {
-        response: raw,
-        candid: Ok(candid.to_string()),
+fn decode_call_response(canister_did: &Option<String>, method: &str, raw: Vec<u8>) -> PerformResult {
+    match canister_did {
+        None => match decode_call_response_without_did(raw.as_slice()) {
+            Ok(candid) => PerformResult::CallResponse {
+                response: raw,
+                candid: Some(candid),
+                error: None,
+            },
+            Err(error) => PerformResult::CallResponse {
+                response: raw,
+                candid: None,
+                error: Some(error),
+            },
+        },
+        Some(canister_did) => match decode_call_response_with_did(canister_did, method, raw.as_slice()) {
+            Ok(candid) => PerformResult::CallResponse {
+                response: raw,
+                candid: Some(candid),
+                error: None,
+            },
+            Err(error) => match decode_call_response_without_did(raw.as_slice()) {
+                Ok(candid) => PerformResult::CallResponse {
+                    response: raw,
+                    candid: Some(candid),
+                    error: Some(error),
+                },
+                Err(error2) => PerformResult::CallResponse {
+                    response: raw,
+                    candid: None,
+                    error: Some(error2),
+                },
+            },
+        },
     }
 }
+
+fn decode_call_response_with_did(canister_did: &str, method: &str, raw: &[u8]) -> Result<String, String> {
+    let ast: IDLProg = canister_did
+        .parse()
+        .map_err(|error| format!("can not parse canister did {error:?}"))?;
+
+    let mut env = TypeEnv::new();
+    let actor = check_prog(&mut env, &ast)
+        .map_err(|error| format!("can not parse canister did {error:?}"))?
+        .ok_or("can not find actor in canister did")?;
+
+    let method = env
+        .get_method(&actor, method)
+        .map_err(|error| format!("can not find '{method}' method in actor: {error:?}"))?;
+
+    let return_arg_types = method.rets.as_slice();
+
+    let idl_args = IDLArgs::from_bytes_with_types(raw, &env, return_arg_types)
+        .map_err(|error| format!("can not parse raw with types: {error:?}"))?;
+
+    Ok(idl_args.to_string())
+}
+
+fn decode_call_response_without_did(raw: &[u8]) -> Result<String, String> {
+    IDLArgs::from_bytes(raw)
+        .map(|idl_args| idl_args.to_string())
+        .map_err(|error| format!("can not parse raw: {error:?}"))
+}
+
+// #[cfg(test)]
+// mod tests {
+//     // use candid::Decode;
+//     // use uploader_canister::types::WasmProperties;
+//
+//     use candid::parser::types::{Binding, Dec, IDLType};
+//     use candid::parser::typing::check_type;
+//     use candid::types::{Type, TypeInner};
+//     use candid::{check_prog, IDLProg};
+//
+//     #[test]
+//     fn test() {
+//         use candid::{IDLArgs, TypeEnv};
+//
+//         // Candid values represented in text format
+//         let text_value = r#"
+//      (record {wasm_length=123 : nat32; wasm_hash="haha"; arg_candid="aaa"})
+// "#;
+//
+//         // Parse text format into IDLArgs for serialization
+//         let args: IDLArgs = text_value.parse().expect("");
+//         println!(">>>> {:?}", args.get_types());
+//
+//         let encoded: Vec<u8> = args.to_bytes().expect("");
+//         println!(">>>> {:?}", encoded);
+//
+//         // Deserialize into IDLArgs
+//         let decoded: IDLArgs = IDLArgs::from_bytes(&encoded).expect("");
+//         assert_eq!(encoded, decoded.to_bytes().expect(""));
+//         //
+//         // Convert IDLArgs to text format
+//         let output: String = decoded.to_string();
+//         println!(">>>> {:?}", output);
+//         println!(">>>> {:?}", decoded.get_types());
+//
+//         let parsed_args: IDLArgs = output.parse().expect("");
+//         let annotated_args = args
+//             .annotate_types(true, &TypeEnv::new(), &parsed_args.get_types())
+//             .expect("");
+//         assert_eq!(annotated_args, parsed_args);
+//
+//         // let wp = Decode!(&encoded, WasmProperties).expect("ss");
+//         // println!(">>>> {:?}", wp);
+//
+//         let did_file = r#"
+//     type Wasm = record { wasm_length: nat32; wasm_hash: text; arg_candid: text };
+//     type byte = nat8;
+//     service : {
+//        f : (byte, int, nat, int8) -> (Wasm);
+//     }
+// "#;
+//         //         let did_file = r#"
+//         //     type Wasm = record { wasm_length: nat32; wasm_hash: text; arg_candid: text };
+//         //     type List = opt record { head: int; tail: List };
+//         //     type byte = nat8;
+//         //     service : {
+//         //       f : (byte, int, nat, int8) -> (List);
+//         //       g : (List) -> (int) query;
+//         //     }
+//         // "#;
+//
+//         // Parse did file into an AST
+//         let ast: IDLProg = did_file.parse().expect("");
+//
+//         let mut env = TypeEnv::new();
+//         let actor: Type = check_prog(&mut env, &ast).expect("").unwrap();
+//
+//         let method = env.get_method(&actor, "f").unwrap();
+//         let r_args = &method.rets;
+//         println!(">>>m> {:?}", method);
+//         let decoded3: IDLArgs = IDLArgs::from_bytes_with_types(&encoded, &env, r_args.as_slice()).expect("");
+//         println!(">>>> {:?}", decoded3.to_string());
+//
+//         let f = match &ast.decs[0] {
+//             Dec::TypD(binding) => {
+//                 println!(">>>> {:?}", binding.typ);
+//                 let mut env = TypeEnv::new();
+//                 let r = env.ast_to_type(&binding.typ);
+//                 println!("r>>>> {:?}", r);
+//
+//                 // &binding.typ
+//                 r.unwrap()
+//             }
+//             Dec::ImportD(_) => panic!(),
+//         };
+//
+//         // Type checking a given .did file
+//         // let (env, opt_actor) = check_file("a.did")?;
+//         // Or alternatively, use check_prog to check in-memory did file
+//         // Note that file import is ignored by check_prog.
+//         let env = TypeEnv::new();
+//         //         let actor: Type = check_prog(&mut env, &ast).expect("").unwrap();
+//         //
+//         //         let method = env.get_method(&actor, "g").unwrap();
+//         //         assert_eq!(method.is_query(), true);
+//         //         assert_eq!(method.args, vec![TypeInner::Var("List".to_string()).into()]);
+//
+//         // Deserialize into IDLArgs
+//         let decoded2: IDLArgs = IDLArgs::from_bytes_with_types(&encoded, &env, vec![f].as_slice()).expect("");
+//         let output2: String = decoded2.to_string();
+//         println!(">>>> {:?}", output2);
+//     }
+// }

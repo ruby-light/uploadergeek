@@ -17,7 +17,7 @@ type Args = record {
 };
 type CallCanister = record {
   method : text;
-  response_candid : text;
+  canister_did : opt text;
   canister_id : principal;
   argument_candid : text;
   payment : opt nat64;
@@ -153,7 +153,11 @@ type PerformProposalResponse = variant {
 type PerformResult = variant {
   Error : record { reason : text };
   Done;
-  CallResponse : record { response : vec nat8; candid : Result };
+  CallResponse : record {
+    error : opt text;
+    response : vec nat8;
+    candid : opt text;
+  };
 };
 type Proposal = record {
   created : nat64;
@@ -179,7 +183,6 @@ type ProposalState = variant {
   Performed : record { result : PerformResult };
 };
 type ProposalType = variant { UpdateGovernance; UpgradeCanister; CallCanister };
-type Result = variant { Ok : text; Err : text };
 type SetGeekUserPrincipalsArgs = record {
   geek_user_principals : vec principal;
 };
