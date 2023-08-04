@@ -18,6 +18,8 @@ fn main() {
 
     generate_query_candid_method!(governance_canister, get_geek_user_principals);
     generate_query_candid_method!(governance_canister, get_my_governance_participant);
+    generate_query_candid_method!(governance_canister, get_proposal);
+    generate_query_candid_method!(governance_canister, get_proposals);
     generate_query_candid_method!(
         governance_canister,
         get_canistergeek_information,

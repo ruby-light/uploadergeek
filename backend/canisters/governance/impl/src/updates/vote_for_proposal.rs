@@ -30,7 +30,7 @@ fn vote_for_proposal_int(args: VoteForProposalArgs) -> Result<VoteForProposalRes
         let proposal = state
             .model
             .proposal_storage
-            .get_proposal(&proposal_id)
+            .get_proposal_mut(&proposal_id)
             .ok_or(VoteForProposalError::ProposalNotFound)?;
 
         if !matches!(proposal.state, ProposalState::Voting) {

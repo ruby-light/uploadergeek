@@ -1,5 +1,6 @@
 use governance_canister::types::{Proposal, ProposalId};
 use serde::{Deserialize, Serialize};
+use std::collections::btree_map::Iter;
 use std::collections::BTreeMap;
 
 type ProposalTable = BTreeMap<ProposalId, Proposal>;
@@ -11,7 +12,11 @@ pub struct ProposalStorage {
 }
 
 impl ProposalStorage {
-    pub(crate) fn get_proposal(&mut self, proposal_id: &ProposalId) -> Option<&mut Proposal> {
+    pub(crate) fn get_proposal(&self, proposal_id: &ProposalId) -> Option<&Proposal> {
+        self.proposals_table.get(proposal_id)
+    }
+
+    pub(crate) fn get_proposal_mut(&mut self, proposal_id: &ProposalId) -> Option<&mut Proposal> {
         self.proposals_table.get_mut(proposal_id)
     }
 
@@ -23,5 +28,9 @@ impl ProposalStorage {
     pub(crate) fn add_new_proposal(&mut self, proposal_id: ProposalId, proposal: Proposal) {
         assert!(!self.proposals_table.contains_key(&proposal_id));
         self.proposals_table.insert(proposal_id, proposal);
+    }
+
+    pub(crate) fn get_proposals_iter(&self) -> Iter<ProposalId, Proposal> {
+        self.proposals_table.iter()
     }
 }

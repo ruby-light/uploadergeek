@@ -1,7 +1,7 @@
 use crate::guards::caller_is_governance_user;
 use crate::time::get_unix_epoch_time_millis;
 use crate::updates::add_new_proposal::parse_candid;
-use crate::{log_error, log_info, mutate_state};
+use crate::{log_error, log_info, mutate_state, read_state};
 use governance_canister::perform_proposal::*;
 use governance_canister::types::{
     CallCanister, PerformResult, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,
@@ -28,7 +28,7 @@ async fn perform_proposal_int(args: PerformProposalArgs) -> Result<PerformPropos
     let caller = ic_cdk::caller();
     let proposal_id = args.proposal_id;
 
-    let proposal_detail = mutate_state(|state| {
+    let proposal_detail = read_state(|state| {
         let proposal = state
             .model
             .proposal_storage
@@ -58,7 +58,7 @@ async fn perform_proposal_int(args: PerformProposalArgs) -> Result<PerformPropos
         let proposal = state
             .model
             .proposal_storage
-            .get_proposal(&proposal_id)
+            .get_proposal_mut(&proposal_id)
             .ok_or(PerformProposalError::ProposalNotFound)?;
 
         if !matches!(proposal.state, ProposalState::Approved) {
