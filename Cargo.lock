@@ -629,6 +629,7 @@ dependencies = [
  "ic-cdk-macros",
  "rmp-serde",
  "serde",
+ "uploader_canister",
 ]
 
 [[package]]
