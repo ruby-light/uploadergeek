@@ -93,6 +93,12 @@ module.exports = (env) => {
     const iiUrl = isDevelopment ? `http://localhost:${REPLICA_LOCAL_PORT}/?canisterId=${internetIdentityCanisterId}` : "https://identity.ic0.app";
     console.log("iiUrl", {iiUrl});
 
+    const splitChunksAdditionalConfig = isDevelopment ? {
+        maxSize: 1024 * 1024,
+        minChunks: 1,
+        priority: -20,
+    } : {}
+
     return {
         target: "web",
         mode: isDevelopment ? "development" : "production",
@@ -113,6 +119,7 @@ module.exports = (env) => {
                         name: "node_vendors",
                         test: /[\\/]node_modules[\\/]/,
                         chunks: "all",
+                        ...splitChunksAdditionalConfig
                     }
                 },
             }
