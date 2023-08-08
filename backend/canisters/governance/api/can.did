@@ -64,6 +64,8 @@ type GetGeekUserPrincipalsResponse = variant {
 type GetGeekUserPrincipalsResult = record {
   geek_user_principals : vec principal;
 };
+type GetGovernanceResponse = variant { Ok : GetGovernanceResult };
+type GetGovernanceResult = record { governance : Governance };
 type GetInformationRequest = record {
   status : opt StatusRequest;
   metrics : opt MetricsRequest;
@@ -237,6 +239,7 @@ service : (Args) -> {
   get_geek_user_principals : (record {}) -> (
       GetGeekUserPrincipalsResponse,
     ) query;
+  get_governance : (record {}) -> (GetGovernanceResponse) query;
   get_my_governance_participant : (record {}) -> (
       GetMyGovernanceParticipantResponse,
     ) query;

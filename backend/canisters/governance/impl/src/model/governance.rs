@@ -12,6 +12,10 @@ impl GovernanceStorage {
         self.governance = new_governance;
     }
 
+    pub(crate) fn get_governance(&self) -> &Governance {
+        &self.governance
+    }
+
     pub(crate) fn get_governance_participant(&self, principal: &Principal) -> Option<&GovernanceParticipant> {
         self.governance
             .participants
