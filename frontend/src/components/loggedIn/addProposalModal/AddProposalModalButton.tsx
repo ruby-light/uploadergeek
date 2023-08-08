@@ -12,6 +12,7 @@ import {AddProposalUpdateGovernanceModalComponent} from "src/components/loggedIn
 import {AddProposalCallCanisterModalComponent} from "src/components/loggedIn/addProposalModal/AddProposalCallCanisterModalComponent";
 import {useCurrentParticipantContext} from "src/components/loggedIn/LoggedInWelcomeWrapper";
 import {useCustomCompareMemo} from "use-custom-compare";
+import {AddProposalUpgradeCanisterModalComponent} from "src/components/loggedIn/addProposalModal/AddProposalUpgradeCanisterModalComponent";
 
 export type ProposalTypeUI = KeysOfUnion<ProposalType>
 
@@ -85,6 +86,21 @@ export const AddProposalModalButton = (props: Props) => {
     }, [isMounted])
 
     ////////////////////////////////////////////////
+    // UpgradeCanister modal
+    ////////////////////////////////////////////////
+
+    const [modalUpgradeCanisterVisible, setModalUpgradeCanisterVisible] = useReducer<Reducer<ModalVisibility, Partial<ModalVisibility>>>(
+        (state, newState) => ({...state, ...newState}),
+        {visible: false, nonce: 0}
+    )
+
+    const onModalUpgradeCanisterDestroy: ModalOnDestroy = useCallback(() => {
+        if (isMounted()) {
+            setModalUpgradeCanisterVisible({visible: false})
+        }
+    }, [isMounted])
+
+    ////////////////////////////////////////////////
     // onChange
     ////////////////////////////////////////////////
 
@@ -100,6 +116,10 @@ export const AddProposalModalButton = (props: Props) => {
                 setModalCallCanisterVisible({visible: true, nonce: modalCallCanisterVisible.nonce + 1})
                 break;
             }
+            case "UpgradeCanister": {
+                setModalUpgradeCanisterVisible({visible: true, nonce: modalUpgradeCanisterVisible.nonce + 1})
+                break;
+            }
         }
     }, [modalUpdateGovernanceVisible.nonce, modalCallCanisterVisible.nonce])
 
@@ -112,12 +132,16 @@ export const AddProposalModalButton = (props: Props) => {
                                                    visible={modalCallCanisterVisible.visible}
                                                    onDestroy={onModalCallCanisterDestroy}
         />
+        <AddProposalUpgradeCanisterModalComponent key={`addProposalUpgradeCanister${modalUpgradeCanisterVisible.nonce}`}
+                                                   visible={modalUpgradeCanisterVisible.visible}
+                                                   onDestroy={onModalUpgradeCanisterDestroy}
+        />
         <Cascader<OptionType>
             options={options}
             onChange={onChange}
             displayRender={displayRender}
             dropdownMatchSelectWidth={true}
-            // popupClassName={"ug-cascader-menu"}
+            popupClassName={"ug-cascader-menu"}
             // style={{width: "150px"}}
             disabled={false}
             size={"small"}

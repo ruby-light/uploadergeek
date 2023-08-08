@@ -2,12 +2,11 @@ import * as React from "react";
 import {Reducer, useReducer} from "react";
 import _ from "lodash"
 import {ModalButtonProps, ModalProps} from "src/components/common/ModalCommon";
-import {useCustomCompareCallback} from "use-custom-compare";
 import {Button, Form, Input, Modal, Space} from "antd";
 import {useForm} from "antd/lib/form/Form";
 import {FieldData} from "rc-field-form/lib/interface";
-import {createICOptional, getICRequestErrName, isCanisterPrincipalValid, isErr, isOk} from "geekfactory-ic-js-util";
-import {AddNewProposalArgs, AddNewProposalError, AddNewProposalResponse, CallCanister, ProposalDetail} from "declarations/governance/governance.did";
+import {createICOptional, getICRequestErrName, isCanisterPrincipalValid, isErr, isOk, isPrincipalValid} from "geekfactory-ic-js-util";
+import {AddNewProposalArgs, AddNewProposalError, AddNewProposalResponse, ProposalDetail} from "declarations/governance/governance.did";
 import {Principal} from "@dfinity/principal";
 import {delayPromise, GFError, hasOwnProperty, KeysOfUnion} from "geekfactory-js-util";
 import PubSub from "pubsub-js";
@@ -15,25 +14,28 @@ import {REFRESH_PROPOSALS_TOPIC} from "src/components/loggedIn/ProposalsSection"
 import {useActorsContext} from "src/components/data/ActorsProvider";
 
 type FormValuesType = {
-    methodName: string
-    canisterDid: string
+    uploaderId: string
+    operatorId: string
     canisterId: string
+    moduleHash: string
     argumentCandid: string
     description: string
 }
 
 const initialValues: FormValuesType = {
-    methodName: "",
-    canisterDid: "",
+    uploaderId: "",
+    operatorId: "",
     canisterId: "",
+    moduleHash: "",
     argumentCandid: "",
     description: ""
 }
 
 const DEV_initialValues: FormValuesType = {
-    methodName: "get_my_governance_participant",
-    canisterDid: "",
+    uploaderId: "qaa6y-5yaaa-aaaaa-aaafa-cai",
+    operatorId: "myqmt-pj6bp-oenqu-pnjbc-qglgl-elokq-n54ms-gyyds-ao5hs-ldrvi-zqe",
     canisterId: "qsgjb-riaaa-aaaaa-aaaga-cai",
+    moduleHash: "65dc805fefad650babd7156aaa45e76b978950c3f9ca0e31a12c5f6014514b45",
     argumentCandid: "(record{})",
     description: ""
 }
@@ -43,7 +45,7 @@ const modalButtonsPropsInitialValue: ModalButtonProps = {
     cancel: {}
 }
 
-const title = `Create a new "Call Canister" proposal`
+const title = `Create a new "Upgrade Canister" proposal`
 
 const okText = "Create"
 const errorText = "Proposal cannot be created. Please try again later."
@@ -52,7 +54,7 @@ interface Props extends ModalProps {
 
 }
 
-export const AddProposalCallCanisterModalComponent = (props: Props) => {
+export const AddProposalUpgradeCanisterModalComponent = (props: Props) => {
     const actorsContext = useActorsContext();
 
     const formDefaultValues = process.env.NODE_ENV === "development" ? DEV_initialValues : initialValues
@@ -183,27 +185,52 @@ export const AddProposalCallCanisterModalComponent = (props: Props) => {
               onFieldsChange={onFormFieldsChange}
               autoComplete={"off"}>
             <Space direction={"vertical"} style={{width: "100%"}} size={"middle"}>
-                <Form.Item label="Method Name" name={"methodName"} rules={[{required: true, message: 'Missing method name'},]}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item label="Canister ID" name={"canisterId"} rules={[
+                <Form.Item label="Uploader Principal" name={"uploaderId"} rules={[
                     {
                         required: true,
                         validator: (rule, value) => {
                             if (isCanisterPrincipalValid(value)) {
                                 return Promise.resolve()
                             } else {
-                                return Promise.reject("Invalid canister ID")
+                                return Promise.reject("Invalid uploader principal")
                             }
                         }
                     },
                 ]}>
                     <Input/>
                 </Form.Item>
-                <Form.Item label="Argument Candid" name={"argumentCandid"} rules={[{required: true, message: 'Missing argument candid'},]}>
-                    <Input.TextArea/>
+                <Form.Item label="Operator Principal" name={"operatorId"} rules={[
+                    {
+                        required: true,
+                        validator: (rule, value) => {
+                            if (isPrincipalValid(value)) {
+                                return Promise.resolve()
+                            } else {
+                                return Promise.reject("Invalid operator principal")
+                            }
+                        }
+                    },
+                ]}>
+                    <Input/>
                 </Form.Item>
-                <Form.Item label="Canister DID" name={"canisterDid"} rules={[]}>
+                <Form.Item label="Canister Principal" name={"canisterId"} rules={[
+                    {
+                        required: true,
+                        validator: (rule, value) => {
+                            if (isCanisterPrincipalValid(value)) {
+                                return Promise.resolve()
+                            } else {
+                                return Promise.reject("Invalid canister principal")
+                            }
+                        }
+                    },
+                ]}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item label="Module Hash" name={"moduleHash"} rules={[{required: true, message: 'Missing module hash'},]}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item label="Argument Candid" name={"argumentCandid"} rules={[{required: true, message: 'Missing argument candid'},]}>
                     <Input.TextArea/>
                 </Form.Item>
                 <Form.Item label={"Description"} name={"description"}>
@@ -222,13 +249,13 @@ export const AddProposalCallCanisterModalComponent = (props: Props) => {
 
 const createProposalDetail = (formValues: FormValuesType): ProposalDetail | undefined => {
     const proposalDetail: ProposalDetail = {
-        CallCanister: {
+        UpgradeCanister: {
             task: {
-                method: formValues.methodName,
+                uploader_id: Principal.fromText(formValues.uploaderId),
+                operator_id: Principal.fromText(formValues.operatorId),
                 canister_id: Principal.fromText(formValues.canisterId),
-                canister_did: createICOptional(_.isEmpty(formValues.canisterDid) ? undefined : formValues.canisterDid),
+                module_hash: formValues.moduleHash,
                 argument_candid: formValues.argumentCandid,
-                payment: createICOptional(),
             }
         }
     }

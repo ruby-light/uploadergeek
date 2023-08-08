@@ -207,7 +207,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
         }
     }
 
-    return <Modal width={735} closable={false} maskClosable={false} destroyOnClose={true}
+    return <Modal width={735} closable={false} maskClosable={false} destroyOnClose={true} keyboard={false}
                   open={props.visible} title={title} onCancel={onCancel} okText={okText} onOk={onOk}
                   okButtonProps={modalButtonProps.ok} cancelButtonProps={modalButtonProps.cancel} /*className={"ug-modal"}*/
                   footer={null}
@@ -413,9 +413,12 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>Submit</Button>
-                        </Form.Item>
+                        <Space style={{width: "100%", justifyContent: "end"}}>
+                            <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>Cancel</Button>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>Submit</Button>
+                            </Form.Item>
+                        </Space>
                     </Col>
                 </Row>
             </Form>

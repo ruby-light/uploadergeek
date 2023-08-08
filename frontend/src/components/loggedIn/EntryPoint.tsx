@@ -6,9 +6,11 @@ import {ProposalEntryPoint} from "src/components/loggedIn/proposal/ProposalEntry
 type Props = {}
 
 export const EntryPoint = (props: Props) => {
-    return <Switch>
-        <Route path={"/"} exact component={Home}/>
-        <Route path={"/proposal/:proposalId"} exact component={ProposalEntryPoint}/>
-        <Redirect to={"/"}/>
-    </Switch>
+    return <div style={{paddingBottom: 30}}>
+        <Switch>
+            <Route path={"/"} exact component={Home}/>
+            <Route path={"/proposal/:proposalId"} exact component={ProposalEntryPoint}/>
+            <Redirect to={"/"}/>
+        </Switch>
+    </div>
 }

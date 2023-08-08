@@ -3,7 +3,7 @@ import {Reducer, useCallback, useEffect, useReducer} from "react";
 import {Descriptions, Input, Space, Spin, Tag, Typography} from "antd";
 import {useCurrentParticipantContext} from "src/components/loggedIn/LoggedInWelcomeWrapper";
 import {Toolbar} from "src/components/loggedIn/Toolbar";
-import {CallCanister, GetProposalArgs, GetProposalError, GetProposalResponse, Governance, Proposal, Vote} from "declarations/governance/governance.did";
+import {CallCanister, GetProposalArgs, GetProposalError, GetProposalResponse, Governance, Proposal, UpgradeCanister, Vote} from "declarations/governance/governance.did";
 import {COLOR_DANGER_HEX, Feature, formatDate, getDefaultFeature, GFError, hasOwnProperty, KeysOfUnion, now, Record_Partial, simpleFeatureReducer, truncateMiddle} from "geekfactory-js-util";
 import {useActorsContext} from "src/components/data/ActorsProvider";
 import {getICFirstKey, getICOptional, toHexString} from "geekfactory-ic-js-util";
@@ -152,12 +152,81 @@ const ProposalAdditionalInfo = (props: { proposal: Proposal }) => {
         return <ProposalUpdateGovernanceAdditionalInfo proposal={proposal} newGovernance={proposal.detail.UpdateGovernance.new_governance}/>
     } else if (hasOwnProperty(proposal.detail, "CallCanister")) {
         return <ProposalCallCanisterAdditionalInfo proposal={proposal} task={proposal.detail.CallCanister.task}/>
+    } else if (hasOwnProperty(proposal.detail, "UpgradeCanister")) {
+        return <ProposalUpgradeCanisterAdditionalInfo proposal={proposal} task={proposal.detail.UpgradeCanister.task}/>
     }
     return null
 }
 
 const ProposalUpdateGovernanceAdditionalInfo = (props: { proposal: Proposal, newGovernance: Governance }) => {
     return <GovernanceInfo governance={props.newGovernance} title={"New Governance:"}/>
+}
+
+const ProposalUpgradeCanisterAdditionalInfo = (props: { proposal: Proposal, task: UpgradeCanister }) => {
+    const {proposal, task} = props;
+    const governanceDataContext = useGovernanceDataContext();
+
+    const taskInfo = <div>
+        <h3>Upgrade Canister task</h3>
+        <Descriptions bordered column={1} size={"small"}>
+            <Descriptions.Item label={"Uploader Principal"}><CopyablePrincipalComponent principal={task.uploader_id.toText()} truncateLength={100}/></Descriptions.Item>
+            <Descriptions.Item label={"Operator Principal"}><CopyablePrincipalComponent principal={task.operator_id.toText()} truncateLength={100}/></Descriptions.Item>
+            <Descriptions.Item label={"Canister Principal"}><CopyablePrincipalComponent principal={task.canister_id.toText()} truncateLength={100}/></Descriptions.Item>
+            <Descriptions.Item label={"Module Hash"}>{task.module_hash}</Descriptions.Item>
+            <Descriptions.Item label={"Argument Candid"}>{task.argument_candid}</Descriptions.Item>
+        </Descriptions>
+    </div>
+
+    const taskResultInfo: React.ReactNode = useCustomCompareMemo(() => {
+        if (hasOwnProperty(proposal.state, "Performed")) {
+            const {result} = proposal.state.Performed;
+            if (hasOwnProperty(result, "CallResponse")) {
+                const {candid, error, response} = result.CallResponse
+                const candidText: string = getICOptional(candid) || ""
+                const errorText: string = getICOptional(error) || ""
+                const responseText: string = toHexString(response)
+                return <div>
+                    <h3>Call Canister task result</h3>
+                    <Descriptions bordered column={1} size={"small"}>
+                        <Descriptions.Item label={"Candid"}><Typography.Paragraph>
+                            <pre style={{fontSize: "0.8em"}}>{candidText}</pre>
+                        </Typography.Paragraph></Descriptions.Item>
+                        <Descriptions.Item label={"Error"}><span style={{color: COLOR_DANGER_HEX}}>{errorText}</span></Descriptions.Item>
+                        <Descriptions.Item label={"Response"}><Typography.Text copyable={{text: responseText}}>{truncateMiddle(responseText, 50)}</Typography.Text></Descriptions.Item>
+                    </Descriptions>
+                </div>
+            } else if (hasOwnProperty(result, "Error")) {
+                const {reason} = result.Error;
+                return <div>
+                    <h3>Call Canister task result</h3>
+                    <Descriptions bordered column={1} size={"small"}>
+                        <Descriptions.Item label={"Error"}><span style={{color: COLOR_DANGER_HEX}}>{reason}</span></Descriptions.Item>
+                    </Descriptions>
+                </div>
+            } else if (hasOwnProperty(result, "Done")) {
+                return <div>
+                    <h3>Call Canister task result</h3>
+                    <Descriptions bordered column={1} size={"small"}>
+                        <Descriptions.Item label={"Status"}>Done</Descriptions.Item>
+                    </Descriptions>
+                </div>
+            }
+        }
+        return null
+    }, [proposal, task], _.isEqual)
+
+    const votingConfigurationUpgradeCanister = governanceDataContext.getGovernanceVotingConfigurationByProposalType("UpgradeCanister");
+    const votingConfig = votingConfigurationUpgradeCanister != undefined ? <div>
+        <h3>Voting Config</h3>
+        <Descriptions bordered column={1} size={"small"}>
+            <Descriptions.Item label={"CallCanister"}>stop_vote_count: {votingConfigurationUpgradeCanister.stop_vote_count} / positive_vote_count: {votingConfigurationUpgradeCanister.positive_vote_count}</Descriptions.Item>
+        </Descriptions>
+    </div> : null
+    return <Space direction={"vertical"}>
+        {votingConfig}
+        {taskInfo}
+        {taskResultInfo}
+    </Space>
 }
 
 const ProposalCallCanisterAdditionalInfo = (props: { proposal: Proposal, task: CallCanister }) => {

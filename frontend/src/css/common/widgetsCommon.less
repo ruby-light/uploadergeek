@@ -1,0 +1,113 @@
+////////////////////////////////////
+// Grid
+////////////////////////////////////
+
+.geek-grid {
+  display: grid;
+  justify-content: space-between;
+  //grid-template-columns property set in element's style
+  position: relative;
+  column-gap: 8px;
+  row-gap: 8px;
+
+  .geek-grid-item {
+    //width property set in element's style
+  }
+
+  .geek-grid-loading {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+//////////////////////////////////////////////////
+// Grid Panel
+//////////////////////////////////////////////////
+
+.geek-grid-panel {
+  //background-color: #f0f2f5;
+  background-color: @color-body-bg;
+
+  .geek-grid-panel-row {
+    .geek-grid-panel-col {
+      .geek-grid-panel-col-container {
+        background-color: @component-background;
+        height: 100%;
+      }
+    }
+  }
+}
+
+////////////////////////////////////
+// Table Parameter wrapper
+////////////////////////////////////
+
+.tableParameterWrapper {
+  max-height: 145px;
+  overflow: hidden auto;
+  overflow-wrap: anywhere;
+}
+
+////////////////////////////////////
+// Buttons
+////////////////////////////////////
+
+button.ug-text {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+button.ug-text-full-width {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+////////////////////////////////////
+// Form
+////////////////////////////////////
+
+.ugFormItemVertical {
+
+  flex-direction: column;
+
+  > .ant-form-item-row {
+    flex-direction: column;
+  }
+
+  .ant-form-item-label {
+
+    padding: 0 0 2px;
+    line-height: 1.5715;
+    white-space: initial;
+    text-align: left;
+
+    > label {
+      height: auto;
+    }
+
+    > label::after {
+      content: revert;
+      position: revert;
+      top: revert;
+      margin: revert;
+    }
+  }
+}
+
+////////////////////////////////////
+// Cascader search menu
+////////////////////////////////////
+
+.ug-cascader-menu {
+  .ant-cascader-menu {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+  }
+}
