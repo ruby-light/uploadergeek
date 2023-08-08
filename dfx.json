@@ -9,6 +9,42 @@
       "candid": "backend/canisters/governance/api/can.did",
       "package": "governance_canister_impl",
       "type": "rust"
+    },
+    "frontend_prod_debug": {
+      "frontend": {
+        "entrypoint": "frontend/src/index.html"
+      },
+      "source": [
+        "frontend/assets",
+        "dist/frontend/"
+      ],
+      "type": "assets"
+    },
+    "frontend_prod": {
+      "frontend": {
+        "entrypoint": "frontend/src/index.html"
+      },
+      "source": [
+        "frontend/assets",
+        "dist/frontend/"
+      ],
+      "type": "assets"
+    },
+    "frontend_test": {
+      "frontend": {
+        "entrypoint": "frontend/src/index.html"
+      },
+      "source": [
+        "frontend/assets",
+        "dist/frontend/"
+      ],
+      "type": "assets"
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "backend/dev/internet_identity/internet_identity.did",
+      "wasm": "backend/dev/internet_identity/internet_identity.wasm",
+      "build": "./bin/build_internet_identity.sh"
     }
   },
   "defaults": {

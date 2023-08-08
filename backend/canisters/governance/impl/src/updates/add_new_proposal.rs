@@ -83,6 +83,8 @@ fn validate_new_governance(governance: &Governance) -> Result<(), String> {
         })
         .count();
 
+    log_info!("can_make_new_governance_proposal: {can_make_new_governance_proposal:?}");
+
     if can_make_new_governance_proposal == 0 {
         return Err("not participant, who can make new governance proposal".to_string());
     }
@@ -96,6 +98,8 @@ fn validate_new_governance(governance: &Governance) -> Result<(), String> {
             })
         })
         .count();
+
+    log_info!("can_vote_governance_proposal_count: {can_vote_governance_proposal_count:?}");
 
     let governance_voting_possible = governance.voting_configuration.iter().any(|(proposal_type, config)| {
         proposal_type == &ProposalType::UpdateGovernance
