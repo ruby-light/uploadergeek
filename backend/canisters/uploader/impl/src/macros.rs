@@ -41,22 +41,6 @@ macro_rules! canister_state {
 }
 
 #[macro_export]
-macro_rules! generate_c2c_call {
-    ($method_name:ident) => {
-        pub async fn $method_name(
-            canister_id: candid::Principal,
-            args: &$method_name::Args,
-        ) -> ic_cdk::api::call::CallResult<$method_name::Response> {
-            let method_name = stringify!($method_name);
-            let result: ic_cdk::api::call::CallResult<($method_name::Response,)> =
-                ic_cdk::call(canister_id, method_name, (args,)).await;
-
-            result.map(|r| r.0)
-        }
-    };
-}
-
-#[macro_export]
 macro_rules! log_info {
     ($($arg:tt)*) => {{
         let message = format!($($arg)*);

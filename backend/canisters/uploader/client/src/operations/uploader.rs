@@ -14,10 +14,10 @@ pub async fn set_operation_grant(
     uploader_canister_id: &Principal,
     canister_id: Principal,
     operation_type: OperationType,
-    wasm_module: Vec<u8>,
+    wasm_module: &Vec<u8>,
     arg: Vec<u8>,
-) {
-    let wasm_hash = get_module_hash(&wasm_module);
+) -> Result<(), String> {
+    let wasm_hash = get_module_hash(wasm_module);
 
     let grant = Some(OperationGrant {
         operator: agent.get_principal().unwrap(),
@@ -31,10 +31,8 @@ pub async fn set_operation_grant(
     });
 
     match crate::set_operation_grant(agent, uploader_canister_id, &SetOperationGrantArgs { grant }).await {
-        Ok(SetOperationGrantResponse::Ok) => {}
-        response => {
-            panic!("Error while set operation grant: {:?}", response)
-        }
+        Ok(SetOperationGrantResponse::Ok) => Ok(()),
+        response => Err(format!("Error while set operation grant: {:?}", response)),
     }
 }
 
@@ -70,12 +68,10 @@ pub async fn put_wasm_to_uploader(agent: &Agent, uploader_canister_id: &Principa
     Ok(())
 }
 
-pub async fn perform_operation(agent: &Agent, uploader_canister_id: &Principal) {
+pub async fn perform_operation(agent: &Agent, uploader_canister_id: &Principal) -> Result<(), String> {
     match crate::perform_operation(agent, uploader_canister_id, &EmptyArgs {}).await {
-        Ok(PerformOperationResponse::Ok) => {}
-        response => {
-            panic!("Error while perform operation: {:?}", response)
-        }
+        Ok(PerformOperationResponse::Ok) => Ok(()),
+        response => Err(format!("Error while perform operation: {:?}", response)),
     }
 }
 
