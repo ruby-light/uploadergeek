@@ -2336,7 +2336,7 @@ dependencies = [
 
 [[package]]
 name = "uploader_canister_client"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "candid",
  "dirs",
