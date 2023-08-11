@@ -4,7 +4,7 @@ import _ from "lodash"
 import {allKnownCanisterIds, Canisters} from "src/ic/canisters";
 import {ActorSubclass} from "@dfinity/agent";
 import {AuthProvider, AuthSourceProvider, InfinityWalletAuthProvider, InternetIdentityAuthProvider, InternetIdentityAuthProviderContext, NFIDInternetIdentityAuthProviderContext, PlugAuthProvider, StoicAuthProvider, useAuthProviderContext} from "geekfactory-ic-js-auth";
-import {Layout, Spin} from "antd";
+import {Spin} from "antd";
 import {AppThemeProvider} from "src/components/sys/theme/AppThemeProvider";
 import {AnonymousLoginPage} from "src/components/anonymous/AnonymousLoginPage";
 import {ActorsProvider} from "src/components/data/ActorsProvider";
@@ -12,7 +12,6 @@ import {LoggedInWelcomeWrapper} from "src/components/loggedIn/LoggedInWelcomeWra
 import {GovernanceDataProvider} from "src/components/data/GovernanceDataProvider";
 import {CurrentGovernanceProvider} from "src/components/loggedIn/CurrentGovernanceProvider";
 import {EntryPoint} from "src/components/loggedIn/EntryPoint";
-const {Header, Footer, Sider, Content} = Layout;
 
 export const actorsByCanisterId: { [key: string]: ActorSubclass | undefined } = {}
 const clearActorsByCanisterId = () => {

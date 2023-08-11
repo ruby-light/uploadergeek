@@ -12,6 +12,7 @@ Moment.tz.setDefault("UTC");
 // AppConfig.init()
 
 import {App} from "src/components/App";
+// import {App} from "geekfactory_governance_frontend";
 
 ReactDOM.render(<Router>
     <App/>

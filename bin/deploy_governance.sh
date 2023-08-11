@@ -16,7 +16,7 @@ IDENTITY=$2
 
 ./bin/generate_governance_candid.sh
 
-header "Create governance canister on '${NETWORK_ALIAS}'"
+header "Create governance canister on '${NETWORK_ALIAS}' using identity '${IDENTITY}'"
 
 IDENTITY_PRINCIPAL="$(dfx --identity "$IDENTITY" identity get-principal)"
 

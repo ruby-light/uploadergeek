@@ -16,7 +16,7 @@ IDENTITY=$2
 
 ./bin/generate_uploader_candid.sh
 
-header "Create uploader canister on '${NETWORK_ALIAS}'"
+header "Create uploader canister on '${NETWORK_ALIAS}' using identity '${IDENTITY}'"
 
 IDENTITY_PRINCIPAL="$(dfx --identity "$IDENTITY" identity get-principal)"
 
