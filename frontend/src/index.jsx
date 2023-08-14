@@ -8,12 +8,11 @@ Moment.locale("en");
 Moment.tz.setDefault("UTC");
 //IMPORTANT: This is required BEFORE "App" component is imported
 
-// import {AppConfig} from "src/components/sys/config/AppConfig";
-// AppConfig.init()
+import {GovernanceApp} from "geekfactory_governance_frontend";
+import "./index.less"
 
-import {App} from "src/components/App";
-// import {App} from "geekfactory_governance_frontend";
-
+console.log("process.env.FRONTEND_CANISTER", process.env.FRONTEND_CANISTER);
+console.log("process.env.GOVERNANCE_CANISTER_ID", process.env.GOVERNANCE_CANISTER_ID);
 ReactDOM.render(<Router>
-    <App/>
+    <GovernanceApp governanceCanisterId={process.env.GOVERNANCE_CANISTER_ID} currentAssetCanisterId={process.env.FRONTEND_CANISTER}/>
 </Router>, document.getElementById('root'))

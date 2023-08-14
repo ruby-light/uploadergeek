@@ -28,9 +28,7 @@ dfx --identity "$IDENTITY" canister --network "${NETWORK_ALIAS}" --wallet \
 header "Deploy governance canister on '${NETWORK_ALIAS}'"
 
 PARTICIPANT_1="record{principal \"${IDENTITY_PRINCIPAL}\"; record{name=\"identity\";proposal_permissions=vec{record{variant{UpdateGovernance};vec{variant{Add};variant{Vote};variant{Perform}}}}}}"
-PARTICIPANT_2="record{principal \"4yl5c-iixs5-wuyhi-bals2-ddskn-tlm3z-vdsy7-rcmsd-yfujt-f3i2g-7ae\"; record{name=\"local_II_10000\";proposal_permissions=vec{record{variant{UpdateGovernance};vec{variant{Add};variant{Vote};variant{Perform}}};record{variant{CallCanister};vec{variant{Add};variant{Vote};variant{Perform}}};record{variant{UpgradeCanister};vec{variant{Add};variant{Vote};variant{Perform}}};}}}"
-PARTICIPANT_3="record{principal \"bwqqq-n4zxd-xvzc2-pv4e3-hz5kq-zy2a3-yd3w6-k6blz-d5u7p-y5eto-qae\"; record{name=\"local_II_10001\";proposal_permissions=vec{record{variant{UpdateGovernance};vec{variant{Add};variant{Vote};variant{Perform}}}}}}"
-PARTICIPANTS="vec{${PARTICIPANT_2};${PARTICIPANT_3}}"
+PARTICIPANTS="vec{${PARTICIPANT_1}}"
 VOTING_CONFIGURATION="vec {record{variant{UpdateGovernance};record{stop_vote_count=1;positive_vote_count=1}};record{variant{CallCanister};record{stop_vote_count=1;positive_vote_count=1}};record{variant{UpgradeCanister};record{stop_vote_count=1;positive_vote_count=1}}}"
 GEEK_USER_PRINCIPALS="vec {principal \"${IDENTITY_PRINCIPAL}\"}"
 

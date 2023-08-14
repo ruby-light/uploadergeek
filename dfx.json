@@ -10,33 +10,13 @@
       "package": "governance_canister_impl",
       "type": "rust"
     },
-    "frontend_prod_debug": {
+    "governance_frontend_debug": {
+      "__comment__": "Governance frontend debug build (on localhost or network=ic with debug)",
       "frontend": {
         "entrypoint": "frontend/src/index.html"
       },
       "source": [
-        "frontend/assets",
-        "dist/frontend/"
-      ],
-      "type": "assets"
-    },
-    "frontend_prod": {
-      "frontend": {
-        "entrypoint": "frontend/src/index.html"
-      },
-      "source": [
-        "frontend/assets",
-        "dist/frontend/"
-      ],
-      "type": "assets"
-    },
-    "frontend_test": {
-      "frontend": {
-        "entrypoint": "frontend/src/index.html"
-      },
-      "source": [
-        "frontend/assets",
-        "dist/frontend/"
+        "dist/governance_frontend_debug/"
       ],
       "type": "assets"
     },
