@@ -15,7 +15,7 @@ IDENTITY=$2
 ASSET_CANISTER_NAME=$3
 ADDITIONAL_ENV_VARIABLES=$4
 
-header "Create IDgeek Governance frontend canister '${ASSET_CANISTER_NAME}' on '${NETWORK_ALIAS}' using identity '${IDENTITY}' with additional env variables '${ADDITIONAL_ENV_VARIABLES}'"
+header "Create IDgeek Governance frontend canister '${ASSET_CANISTER_NAME}' on '${NETWORK_ALIAS}' network using identity '${IDENTITY}' with additional env variables '${ADDITIONAL_ENV_VARIABLES}'"
 
 echo "Proceed? (y/n)"
 read answer

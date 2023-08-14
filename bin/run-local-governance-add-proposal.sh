@@ -11,7 +11,7 @@ header "Create governance proposal to add UI 10000 user in network '${NETWORK_AL
 IDENTITY_PRINCIPAL="$(dfx --identity "$IDENTITY" identity get-principal)"
 
 PERMISSIONS_ALL="vec{record{variant{UpdateGovernance};vec{variant{Add};variant{Vote};variant{Perform}}};record{variant{CallCanister};vec{variant{Add};variant{Vote};variant{Perform}}};record{variant{UpgradeCanister};vec{variant{Add};variant{Vote};variant{Perform}}};}"
-LOCAL_II_10000_PRINCIPAL="eszuk-g3ton-3emrz-2uq23-oub4m-u2fhr-gd3vt-xkwf3-ldco5-vbhdd-iqe"
+LOCAL_II_10000_PRINCIPAL="eiwkf-df3ud-wh6dv-5gvkk-eotk6-4rjla-fb2ql-zpci4-2j6pw-tpju7-2qe"
 
 PARTICIPANT_LOCAL_II_10000="record{principal \"${LOCAL_II_10000_PRINCIPAL}\"; record{name=\"local_II_10000\";proposal_permissions=${PERMISSIONS_ALL}}; }"
 PARTICIPANTS="vec{${PARTICIPANT_LOCAL_II_10000}}"
