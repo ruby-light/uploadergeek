@@ -34,7 +34,7 @@ async fn set_controllers_int(args: SetControllersArgs) -> Result<String, SetCont
 }
 
 fn validate_new_controllers(new_controllers: &[Principal]) -> Result<(), SetControllersError> {
-    if new_controllers.contains(&ic_cdk::caller()) {
+    if new_controllers.contains(&ic_cdk::id()) {
         Ok(())
     } else {
         Err(SetControllersError::LoseControllerDangerous)

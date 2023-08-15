@@ -1,3 +1,4 @@
+pub mod get_canister_status;
 pub mod perform_call;
 pub mod perform_operation;
 pub mod set_controllers;

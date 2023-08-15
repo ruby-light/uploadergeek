@@ -34,6 +34,13 @@ type DailyMetricsData = record {
   canisterMemorySize : NumericEntity;
   timeMillis : int;
 };
+type GetCanisterStatusArgs = record { canister_id : principal };
+type GetCanisterStatusError = variant { CallError : record { reason : text } };
+type GetCanisterStatusResponse = variant {
+  Ok : GetCanisterStatusResult;
+  Err : GetCanisterStatusError;
+};
+type GetCanisterStatusResult = record { status : text };
 type GetGeekUserPrincipalsResponse = variant {
   Ok : GetGeekUserPrincipalsResult;
 };
@@ -168,6 +175,7 @@ service : {
   getCanistergeekInformation : (GetInformationRequest) -> (
       opt GetInformationResponse,
     ) query;
+  get_canister_status : (GetCanisterStatusArgs) -> (GetCanisterStatusResponse);
   get_geek_user_principals : (record {}) -> (
       GetGeekUserPrincipalsResponse,
     ) query;

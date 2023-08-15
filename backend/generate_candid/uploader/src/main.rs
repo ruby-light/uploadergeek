@@ -2,6 +2,7 @@ use icgeek_candid_gen::*;
 
 #[allow(deprecated)]
 fn main() {
+    generate_update_candid_method!(uploader_canister, get_canister_status);
     generate_update_candid_method!(uploader_canister, set_service_principals);
     generate_update_candid_method!(uploader_canister, set_geek_user_principals);
     generate_update_candid_method!(uploader_canister, set_operation_grant);

@@ -1,6 +1,6 @@
 use candid::Principal;
 use ic_cdk::api::management_canister::main::{
-    CanisterInstallMode, CanisterSettings, InstallCodeArgument, UpdateSettingsArgument,
+    CanisterIdRecord, CanisterInstallMode, CanisterSettings, InstallCodeArgument, UpdateSettingsArgument,
 };
 
 pub(crate) async fn install_canister_code(
@@ -31,4 +31,11 @@ pub(crate) async fn set_controllers(canister_id: Principal, controllers: Vec<Pri
     })
     .await
     .map_err(|e| format!("{:?}", e))
+}
+
+pub(crate) async fn get_canister_status(canister_id: Principal) -> Result<String, String> {
+    ic_cdk::api::management_canister::main::canister_status(CanisterIdRecord { canister_id })
+        .await
+        .map_err(|e| format!("{:?}", e))
+        .map(|status| format!("{:?}", status.0))
 }
