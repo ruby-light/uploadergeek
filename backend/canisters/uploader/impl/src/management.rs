@@ -10,7 +10,7 @@ pub(crate) async fn install_canister_code(
     arg: Vec<u8>,
 ) -> Result<(), String> {
     ic_cdk::api::management_canister::main::install_code(InstallCodeArgument {
-        mode: if upgrade { CanisterInstallMode::Upgrade } else { CanisterInstallMode::Install },
+        mode: if upgrade { CanisterInstallMode::Upgrade(None) } else { CanisterInstallMode::Install },
         canister_id,
         wasm_module,
         arg,
@@ -27,6 +27,9 @@ pub(crate) async fn set_controllers(canister_id: Principal, controllers: Vec<Pri
             compute_allocation: None,
             memory_allocation: None,
             freezing_threshold: None,
+            reserved_cycles_limit: None,
+            log_visibility: None,
+            wasm_memory_limit: None,
         },
     })
     .await

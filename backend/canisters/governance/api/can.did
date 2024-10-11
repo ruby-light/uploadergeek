@@ -157,7 +157,7 @@ type PerformResult = variant {
   Done;
   CallResponse : record {
     error : opt text;
-    response : vec nat8;
+    response : blob;
     candid : opt text;
   };
 };

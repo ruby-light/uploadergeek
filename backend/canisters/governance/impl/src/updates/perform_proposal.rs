@@ -2,7 +2,8 @@ use crate::guards::caller_is_governance_user;
 use crate::time::get_unix_epoch_time_millis;
 use crate::updates::add_new_proposal::parse_candid;
 use crate::{log_error, log_info, mutate_state, read_state};
-use candid::{check_prog, IDLArgs, IDLProg, TypeEnv};
+use candid::{IDLArgs, TypeEnv};
+use candid_parser::{check_prog, IDLProg};
 use governance_canister::perform_proposal::*;
 use governance_canister::types::{
     CallCanister, PerformResult, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,

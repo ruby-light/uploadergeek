@@ -2,6 +2,7 @@ use crate::guards::caller_is_governance_user;
 use crate::time::get_unix_epoch_time_millis;
 use crate::{log_error, log_info, mutate_state};
 use candid::IDLArgs;
+use candid_parser::parse_idl_args;
 use governance_canister::add_new_proposal::*;
 use governance_canister::types::{
     CallCanister, Governance, Proposal, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,
@@ -122,7 +123,8 @@ fn validate_perform_call(perform_call: &CallCanister) -> Result<(), String> {
 }
 
 pub(crate) fn parse_candid(candid: &str) -> Result<Vec<u8>, String> {
-    let map_error = |e| format!("can not parse candid: {e:?}");
-    let args: IDLArgs = candid.parse().map_err(map_error)?;
-    args.to_bytes().map_err(map_error)
+    // let args: IDLArgs = candid.parse().map_err(map_error)?;
+    let args: IDLArgs = parse_idl_args(candid).map_err(|e| format!("can not parse candid: {e:?}"))?;
+
+    args.to_bytes().map_err(|e| format!("can not serialize IDLArgs: {e:?}"))
 }

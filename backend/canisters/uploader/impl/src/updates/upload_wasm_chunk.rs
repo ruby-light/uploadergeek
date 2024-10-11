@@ -36,7 +36,7 @@ fn upload_wasm_chunk_int(args: Args) -> Result<UploadWasmChunkResult, UploadWasm
     })
 }
 
-fn validate_overflow(first: bool, chunk: &Vec<u8>) -> Result<(), UploadWasmChunkError> {
+fn validate_overflow(first: bool, chunk: &[u8]) -> Result<(), UploadWasmChunkError> {
     let (wasm_length, current_length) = mutate_state(|state| {
         (
             state.model.get_operation_grant().unwrap().wasm_properties.wasm_length,

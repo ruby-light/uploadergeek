@@ -100,7 +100,7 @@ type NumericEntity = record {
   last : nat64;
 };
 type OperationGrant = record {
-  arg : vec nat8;
+  arg : blob;
   operation_type : OperationType;
   operator : principal;
   canister_id : principal;
@@ -109,11 +109,11 @@ type OperationGrant = record {
 type OperationType = variant { UpgradeCode; InstallCode };
 type PerformCallArgs = record {
   method : text;
-  args : vec nat8;
+  args : blob;
   canister_id : principal;
 };
 type PerformCallError = variant { CallError : record { reason : text } };
-type PerformCallResult = record { result : vec nat8 };
+type PerformCallResult = record { result : blob };
 type PerformOperationError = variant {
   WrongWasmLength : record { length : nat64 };
   WrongWasmHash : record { hash : text };
@@ -163,7 +163,7 @@ type StatusResponse = record {
 type UpdateInformationRequest = record {
   metrics : opt CollectMetricsRequestType;
 };
-type UploadWasmChunkArgs = record { first : bool; chunk : vec nat8 };
+type UploadWasmChunkArgs = record { first : bool; chunk : blob };
 type UploadWasmChunkError = variant { WasmLengthOverflow };
 type UploadWasmChunkResponse = variant {
   Ok : UploadWasmChunkResult;

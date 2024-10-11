@@ -1,6 +1,6 @@
 [package]
 name = "uploader_canister"
-version = "0.2.0"
+version = "1.0.0"
 edition = "2021"
 description = "A tool for Internet Computer to install and upgrade big wasm module."
 license = "MIT"
@@ -9,6 +9,6 @@ repository = "https://github.com/ruby-light/uploadergeek.git"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-canistergeek_ic_rust = "0.4.1"
-candid = "0.9.1"
-serde = "1.0.146"
+canistergeek_ic_rust = { workspace = true }
+candid = { workspace = true }
+serde = { workspace = true }
