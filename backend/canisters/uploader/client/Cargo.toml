@@ -9,7 +9,7 @@ repository = "https://github.com/ruby-light/uploadergeek.git"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-uploader_canister = "0.2.0"
+uploader_canister = "1.0.0"
 candid = { workspace = true }
 ic-agent = { workspace = true }
 ic-utils = { workspace = true }

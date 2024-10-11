@@ -1,4 +1,3 @@
-use ic_agent::agent::http_transport::ReqwestHttpReplicaV2Transport;
 use ic_agent::identity::{BasicIdentity, Secp256k1Identity};
 use ic_agent::{Agent, Identity};
 use k256::SecretKey;
@@ -33,26 +32,23 @@ pub fn get_dfx_identity_from_pem_content(pem_content: Vec<u8>) -> Result<Box<dyn
     }
 }
 
-pub async fn build_ic_agent(url: String, identity: Box<dyn Identity>) -> Agent {
-    let mainnet = is_mainnet(&url);
-    let transport = ReqwestHttpReplicaV2Transport::create(url).expect("Failed to create Reqwest transport");
-
+pub async fn build_ic_agent(main_net: bool, url: String, identity: Box<dyn Identity>) -> Agent {
     let timeout = std::time::Duration::from_secs(60 * 5);
 
     let agent = Agent::builder()
-        .with_transport(transport)
+        .with_url(url)
         .with_boxed_identity(identity)
         .with_ingress_expiry(Some(timeout))
         .build()
         .expect("Failed to build IC agent");
 
-    if !mainnet {
+    if !main_net {
         agent.fetch_root_key().await.expect("Couldn't fetch root key");
     }
 
     agent
 }
 
-pub fn is_mainnet(url: &str) -> bool {
+pub fn is_main_net(url: &str) -> bool {
     url.contains("ic0.app")
 }

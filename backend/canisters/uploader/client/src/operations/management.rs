@@ -52,7 +52,7 @@ pub async fn upgrade_wasm<A: CandidType + Send + Sync>(
     println!("Upgrading wasm for canister {}", canister_id);
     match management_canister
         .install_code(canister_id, wasm_bytes)
-        .with_mode(InstallMode::Upgrade)
+        .with_mode(InstallMode::Upgrade(None))
         .with_arg(args)
         .call_and_wait()
         .await

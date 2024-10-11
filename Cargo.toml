@@ -2,7 +2,7 @@
 resolver = "1"
 members = [
     "backend/canisters/uploader/api",
-#    "backend/canisters/uploader/client",
+    "backend/canisters/uploader/client",
     "backend/canisters/uploader/impl",
     "backend/generate_candid/uploader",
     "backend/canisters/governance/api",
