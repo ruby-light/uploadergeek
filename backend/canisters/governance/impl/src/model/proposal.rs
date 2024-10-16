@@ -20,6 +20,10 @@ impl ProposalStorage {
         self.proposals_table.get_mut(proposal_id)
     }
 
+    pub(crate) fn get_last_proposal_id(&self) -> ProposalId {
+        self.proposal_id_sequence
+    }
+
     pub(crate) fn get_new_proposal_id(&mut self) -> ProposalId {
         self.proposal_id_sequence += 1;
         self.proposal_id_sequence
