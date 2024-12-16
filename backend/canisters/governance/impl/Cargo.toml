@@ -1,6 +1,6 @@
 [package]
 name = "governance_canister_impl"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 description = "A governance for install and upgrade canister."
 license = "MIT"
@@ -22,4 +22,3 @@ serde = { workspace = true }
 rmp-serde = { workspace = true }
 ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
-
