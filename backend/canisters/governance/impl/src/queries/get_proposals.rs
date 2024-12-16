@@ -7,7 +7,7 @@ use ic_cdk_macros::query;
 fn get_proposals(_args: Args) -> Response {
     read_state(|state| {
         let last_proposal_id = state.model.proposal_storage.get_last_proposal_id();
-        let start_from_id = 1 + last_proposal_id.saturating_sub(100);
+        let start_from_id = 1 + last_proposal_id.saturating_sub(50);
 
         let mut proposals = Vec::new();
         for (proposal_id, proposal) in state.model.proposal_storage.get_proposals_iter() {
