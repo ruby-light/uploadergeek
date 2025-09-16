@@ -4,21 +4,23 @@ use governance_canister::get_proposals::*;
 use ic_cdk_macros::query;
 
 #[query(guard = "caller_is_governance_user")]
-fn get_proposals(_args: Args) -> Response {
+fn get_proposals(Args { start, count, ascending }: Args) -> Response {
     read_state(|state| {
         let last_proposal_id = state.model.proposal_storage.get_last_proposal_id();
-        let start_from_id = 1 + last_proposal_id.saturating_sub(50);
+        let total_count = last_proposal_id as usize;
 
-        let mut proposals = Vec::new();
-        for (proposal_id, proposal) in state.model.proposal_storage.get_proposals_iter() {
-            if proposal_id >= &start_from_id {
-                proposals.push(ProposalInfo {
-                    proposal_id: *proposal_id,
-                    proposal: proposal.clone(),
-                });
-            }
-        }
+        let iter = state.model.proposal_storage.get_proposals_iter();
+        let iter: Box<dyn Iterator<Item = _>> = if ascending { Box::new(iter) } else { Box::new(iter.rev()) };
 
-        Response::Ok(GetProposalsResult { proposals })
+        let proposals = iter
+            .skip(start)
+            .take(count)
+            .map(|(proposal_id, proposal)| ProposalInfo {
+                proposal_id: *proposal_id,
+                proposal: proposal.clone(),
+            })
+            .collect();
+
+        Response::Ok(GetProposalsResult { proposals, total_count })
     })
 }

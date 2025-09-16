@@ -115,8 +115,16 @@ type GetProposalResponse = variant {
   Err : GetProposalError;
 };
 type GetProposalResult = record { proposal : Proposal };
+type GetProposalsArgs = record {
+  count : nat64;
+  start : nat64;
+  ascending : bool;
+};
 type GetProposalsResponse = variant { Ok : GetProposalsResult };
-type GetProposalsResult = record { proposals : vec ProposalInfo };
+type GetProposalsResult = record {
+  proposals : vec ProposalInfo;
+  total_count : nat64;
+};
 type Governance = record {
   participants : vec record { principal; GovernanceParticipant };
   voting_configuration : vec record { ProposalType; VotingConfig };
@@ -244,7 +252,7 @@ service : (Args) -> {
       GetMyGovernanceParticipantResponse,
     ) query;
   get_proposal : (GetProposalArgs) -> (GetProposalResponse) query;
-  get_proposals : (record {}) -> (GetProposalsResponse) query;
+  get_proposals : (GetProposalsArgs) -> (GetProposalsResponse) query;
   perform_proposal : (GetProposalArgs) -> (PerformProposalResponse);
   set_geek_user_principals : (SetGeekUserPrincipalsArgs) -> (
       SetGeekUserPrincipalsResponse,

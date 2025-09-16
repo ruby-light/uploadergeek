@@ -1,6 +1,6 @@
 [package]
 name = "governance_canister"
-version = "1.0.0"
+version = "1.0.3"
 edition = "2021"
 description = "A governance for install and upgrade canister."
 license = "MIT"
@@ -12,4 +12,3 @@ repository = "https://github.com/ruby-light/uploadergeek.git"
 canistergeek_ic_rust = { workspace = true }
 candid = { workspace = true }
 serde = { workspace = true }
-
