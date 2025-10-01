@@ -3,6 +3,7 @@ import {Button, Popconfirm, Space} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
 import {ErrorAlert} from 'frontend/src/components/widgets/alert/ErrorAlert';
 import {ErrorMessageText} from 'frontend/src/components/widgets/alert/ErrorMessageText';
+import {FETCH_CURRENT_GOVERNANCE_NOTIFICATION} from 'frontend/src/context/governance/GovernanceProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import {jsonStringify} from 'frontend/src/utils/core/json/json';
 import {hasProperty, type KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
@@ -10,7 +11,6 @@ import {getICFirstKey} from 'frontend/src/utils/ic/did';
 import {useCallback} from 'react';
 import type {GetProposalArgs, Proposal, ProposalType} from 'src/declarations/governance/governance.did';
 import {useMyGovernanceParticipantContext} from '../../../../context/governance/myGovernanceParticipant/MyGovernanceParticipantProvider';
-import {FETCH_CURRENT_GOVERNANCE_NOTIFICATION} from '../CurrentGovernanceProvider';
 import {FETCH_PROPOSAL_NOTIFICATION} from './ProposalPage';
 
 type Props = {
@@ -36,7 +36,7 @@ export const OurPerformControls = (props: Props) => {
             PubSub.publish(FETCH_PROPOSAL_NOTIFICATION);
             PubSub.publish(FETCH_CURRENT_GOVERNANCE_NOTIFICATION);
         }
-        await fetchMyGovernanceParticipant([]);
+        await fetchMyGovernanceParticipant();
     }, [call, fetchMyGovernanceParticipant, proposalId]);
 
     const proposalFromResponse = data?.proposal;

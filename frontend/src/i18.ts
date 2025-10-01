@@ -23,6 +23,25 @@ const rawI18 = {
         },
         yes: 'Yes',
         no: 'No'
+    },
+    auth: {
+        disconnect: {
+            confirmationModal: {
+                title: 'Disconnect',
+                description: 'Do you want to disconnect?',
+                button: 'Disconnect'
+            },
+            button: 'Disconnect'
+        }
+    },
+    toolbar: {
+        title: 'GeekFactory Governance',
+        menu: {
+            home: 'Home',
+            governance: 'Governance',
+            profile: 'Profile',
+            darkMode: 'Dark Mode'
+        }
     }
 };
 

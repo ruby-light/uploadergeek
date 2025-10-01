@@ -1,3 +1,4 @@
+import {isNullish} from '@dfinity/utils';
 import {parseStringToNumber} from 'frontend/src/utils/core/number/transform';
 import {Navigate, useMatch} from 'react-router-dom';
 import {ProposalPage} from './ProposalPage';
@@ -5,7 +6,7 @@ import {ProposalPage} from './ProposalPage';
 export const ProposalEntryPoint = () => {
     const routeMatchIdentity = useMatch('/proposal/:proposalId');
 
-    if (routeMatchIdentity === null) {
+    if (isNullish(routeMatchIdentity)) {
         return <Navigate to="/" />;
     }
 

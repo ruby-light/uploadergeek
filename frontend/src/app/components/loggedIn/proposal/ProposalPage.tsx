@@ -1,25 +1,28 @@
 import {toHexString, uint8ToBuf} from '@dfinity/candid';
-import {fromNullable, isEmptyString, nonNullish} from '@dfinity/utils';
-import {Descriptions, Input, Space, Tag, Typography} from 'antd';
+import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
+import {Flex, Input, Tag, Typography} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
 import {ErrorAlert} from 'frontend/src/components/widgets/alert/ErrorAlert';
 import {ErrorMessageText} from 'frontend/src/components/widgets/alert/ErrorMessageText';
 import {CopyableUIDComponent} from 'frontend/src/components/widgets/uid/CopyableUIDComponent';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import {arrayToUint8Array} from 'frontend/src/utils/core/array/array';
-import {formatDateTime} from 'frontend/src/utils/core/date/format';
+import {formatDateAgo} from 'frontend/src/utils/core/date/format';
 import {jsonStringify} from 'frontend/src/utils/core/json/json';
-import {truncateMiddle} from 'frontend/src/utils/core/string/truncate';
-import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
+import {hasProperty, type KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 
-import {PanelLoadingComponent} from 'frontend/src/components/widgets/PanelLoadingComponent';
+import {DateTimeComponent} from 'frontend/src/components/widgets/DateTimeComponent';
+import {KeyValueVertical} from 'frontend/src/components/widgets/KeyValueVertical';
+import {PanelCard} from 'frontend/src/components/widgets/PanelCard';
+import {PanelHeader} from 'frontend/src/components/widgets/PanelHeader';
+import {AbstractStubPage} from 'frontend/src/components/widgets/stub/AbstractStubPage';
+import {IS_DEV_ENVIRONMENT} from 'frontend/src/utils/env';
 import PubSub from 'pubsub-js';
-import {useCallback, useEffect, useMemo, type ReactNode} from 'react';
-import type {CallCanister, Governance, Proposal, UpgradeCanister, Vote} from 'src/declarations/governance/governance.did';
-import {useGovernanceDataContext} from '../../data/GovernanceDataProvider';
+import {useCallback, useEffect} from 'react';
+import type {CallCanister, Governance, Proposal, ProposalDetail, ProposalType, UpgradeCanister, Vote} from 'src/declarations/governance/governance.did';
+import {useGovernanceContext} from '../../../../context/governance/GovernanceProvider';
 import {GovernanceInfo} from '../GovernanceInfo';
-import {Toolbar} from '../Toolbar';
 import {CopyProposalButton} from './CopyProposalButton';
 import {OurPerformControls} from './OurPerformControls';
 import {OurVoteControls} from './OurVoteControls';
@@ -35,7 +38,16 @@ export const ProposalPage = (props: Props) => {
     const {call, data, feature, responseError} = useICCanisterCallGovernance('getProposal');
 
     const fetchProposal = useCallback(async () => {
-        await call([{proposal_id: BigInt(proposalId)}], {logger: apiLogger, logMessagePrefix: 'getProposal:'});
+        await call([{proposal_id: BigInt(proposalId)}], {
+            logger: apiLogger,
+            logMessagePrefix: 'getProposal:',
+            onBeforeRequest: async () => {
+                if (IS_DEV_ENVIRONMENT) {
+                    // await delayPromise(1000);
+                    // throw new Error(`Simulated error in dev environment ${Date.now()}`);
+                }
+            }
+        });
     }, [call, proposalId]);
 
     useEffect(() => {
@@ -51,284 +63,269 @@ export const ProposalPage = (props: Props) => {
         };
     }, [fetchProposal]);
 
-    const pageHeader = (
-        <Space direction="vertical" size={0}>
-            <h2 style={{margin: 0}}>Proposal: {proposalId}</h2>
-        </Space>
-    );
-
     if (!feature.status.loaded) {
-        return (
-            <Space direction="vertical" style={{width: '100%'}}>
-                <Toolbar />
-                {pageHeader}
-                <PanelLoadingComponent />
-            </Space>
-        );
+        return <AbstractStubPage title="Loading proposal..." icon="loading" />;
     }
 
     if (feature.error.isError || nonNullish(responseError) || data?.proposal == undefined) {
-        const message = 'Unable to load proposal.';
+        const message = `Unable to load proposal ${proposalId}.`;
         const errorDebugContext = feature.error.isError ? feature.error.error?.message : nonNullish(responseError) ? jsonStringify(responseError) : undefined;
         const messageText = <ErrorMessageText message={message} errorDebugContext={errorDebugContext} />;
         return (
-            <Space direction="vertical" style={{width: '100%'}}>
-                <Toolbar />
-                {pageHeader}
+            <Flex vertical>
                 <ErrorAlert message={messageText} />
-            </Space>
+            </Flex>
         );
     }
 
     return (
-        <Space direction="vertical" style={{width: '100%'}}>
-            <Toolbar />
-            {pageHeader}
-            <CopyProposalButton proposal={data.proposal} />
-            <ProposalInfo proposal={data.proposal} />
-        </Space>
+        <Flex vertical gap={16}>
+            <PanelCard>
+                <Flex vertical gap={16}>
+                    <Flex justify="space-between" gap={8} wrap>
+                        <PanelHeader title={`${getICFirstKey(data.proposal.detail)} Proposal: ${proposalId}`} />
+                        <CopyProposalButton proposal={data.proposal} />
+                    </Flex>
+                    <ProposalInfo proposal={data.proposal} />
+                </Flex>
+            </PanelCard>
+            <ProposalVotingPanel proposal={data.proposal} />
+            <ProposalAdditionalInfoPanels proposal={data.proposal} />
+        </Flex>
     );
 };
 
 const ProposalInfo = (props: {proposal: Proposal}) => {
     const {proposal} = props;
 
+    const description = fromNullable(proposal.description);
     return (
-        <Space direction="vertical">
-            <Descriptions bordered column={1} size="small">
-                <Descriptions.Item label="Proposal ID">{proposal.proposal_id.toString()}</Descriptions.Item>
-                <Descriptions.Item label="Initiator">
-                    <CopyableUIDComponent uid={proposal.initiator.toText()} />
-                </Descriptions.Item>
-                <Descriptions.Item label="State">{getICFirstKey(proposal.state)}</Descriptions.Item>
-                <Descriptions.Item label="Created">{formatDateTime(Number(proposal.created))}</Descriptions.Item>
-                <Descriptions.Item label="Updated">{formatDateTime(Number(proposal.updated))}</Descriptions.Item>
-                <Descriptions.Item label="Description">{fromNullable(proposal.description) ?? ''}</Descriptions.Item>
-                <Descriptions.Item label="Voting">
-                    <ProposalVotingInfoAndControls proposal={proposal} />
-                </Descriptions.Item>
-            </Descriptions>
-            <ProposalAdditionalInfo proposal={proposal} />
-        </Space>
+        <Flex vertical gap={8}>
+            <KeyValueVertical label="Proposal ID" value={proposal.proposal_id.toString()} />
+            <KeyValueVertical label="Initiator" value={<CopyableUIDComponent uid={proposal.initiator.toText()} />} />
+            <KeyValueVertical label="State" value={getICFirstKey(proposal.state) ?? '-'} />
+            <KeyValueVertical
+                label="Created"
+                value={
+                    <Flex vertical>
+                        <DateTimeComponent timeMillis={proposal.created} />
+                        <span className="gf-font-size-smaller">{formatDateAgo(Number(proposal.created))}</span>
+                    </Flex>
+                }
+            />
+            <KeyValueVertical
+                label="Updated"
+                value={
+                    <Flex vertical>
+                        <DateTimeComponent timeMillis={proposal.updated} />
+                        <span className="gf-font-size-smaller">{formatDateAgo(Number(proposal.updated))}</span>
+                    </Flex>
+                }
+            />
+            <KeyValueVertical label="Description" value={description ?? '-'} />
+        </Flex>
     );
 };
 
-const ProposalAdditionalInfo = (props: {proposal: Proposal}) => {
+const ProposalVotingPanel = (props: {proposal: Proposal}) => {
+    const {proposal} = props;
+    return (
+        <PanelCard>
+            <Flex vertical gap={16}>
+                <Typography.Title level={5}>Voting</Typography.Title>
+                <ProposalVotingInfoAndControls proposal={proposal} />
+            </Flex>
+        </PanelCard>
+    );
+};
+
+const ProposalAdditionalInfoPanels = (props: {proposal: Proposal}) => {
     const {proposal} = props;
     if (hasProperty(proposal.detail, 'UpdateGovernance')) {
-        return <ProposalUpdateGovernanceAdditionalInfo proposal={proposal} newGovernance={proposal.detail.UpdateGovernance.new_governance} />;
+        return <ProposalUpdateGovernanceAdditionalInfo proposal={proposal} newGovernance={proposal.detail.UpdateGovernance.new_governance} proposalType="UpdateGovernance" />;
     } else if (hasProperty(proposal.detail, 'CallCanister')) {
-        return <ProposalCallCanisterAdditionalInfo proposal={proposal} task={proposal.detail.CallCanister.task} />;
+        return <ProposalCallCanisterAdditionalInfo proposal={proposal} task={proposal.detail.CallCanister.task} proposalType="CallCanister" />;
     } else if (hasProperty(proposal.detail, 'UpgradeCanister')) {
-        return <ProposalUpgradeCanisterAdditionalInfo proposal={proposal} task={proposal.detail.UpgradeCanister.task} />;
+        return <ProposalUpgradeCanisterAdditionalInfo proposal={proposal} task={proposal.detail.UpgradeCanister.task} proposalType="UpgradeCanister" />;
     }
     return null;
 };
 
-const ProposalUpdateGovernanceAdditionalInfo = (props: {proposal: Proposal; newGovernance: Governance}) => {
-    return <GovernanceInfo governance={props.newGovernance} title="New Governance:" />;
+const ProposalUpdateGovernanceAdditionalInfo = (props: {proposal: Proposal; newGovernance: Governance; proposalType: KeysOfUnion<ProposalType>}) => {
+    const {proposal, proposalType} = props;
+
+    const taskInfo = <GovernanceInfo governance={props.newGovernance} title={`${props.proposalType} task`} titleLevel={5} />;
+
+    return (
+        <Flex vertical gap={16}>
+            <ProposalVotingConfigurationPanel proposalType={proposalType} />
+            {taskInfo}
+            <ProposalTaskResultInfo proposal={proposal} proposalType={proposalType} />
+        </Flex>
+    );
 };
 
-const ProposalUpgradeCanisterAdditionalInfo = (props: {proposal: Proposal; task: UpgradeCanister}) => {
-    const {proposal, task} = props;
-    const {getGovernanceVotingConfigurationByProposalType} = useGovernanceDataContext();
+const ProposalUpgradeCanisterAdditionalInfo = (props: {proposal: Proposal; task: UpgradeCanister; proposalType: KeysOfUnion<ProposalType>}) => {
+    const {proposal, task, proposalType} = props;
 
     const taskInfo = (
-        <div>
-            <h3>Upgrade Canister task</h3>
-            <Descriptions bordered column={1} size="small">
-                <Descriptions.Item label="Uploader Principal">
-                    <CopyableUIDComponent uid={task.uploader_id.toText()} truncateLength={100} />
-                </Descriptions.Item>
-                <Descriptions.Item label="Operator Principal">
-                    <CopyableUIDComponent uid={task.operator_id.toText()} truncateLength={100} />
-                </Descriptions.Item>
-                <Descriptions.Item label="Canister Principal">
-                    <CopyableUIDComponent uid={task.canister_id.toText()} truncateLength={100} />
-                </Descriptions.Item>
-                <Descriptions.Item label="Module Hash">{task.module_hash}</Descriptions.Item>
-                <Descriptions.Item label="Argument Candid">{task.argument_candid}</Descriptions.Item>
-            </Descriptions>
-        </div>
+        <PanelCard>
+            <Flex vertical gap={16}>
+                <Typography.Title level={5}>{proposalType} task</Typography.Title>
+                <Flex vertical gap={8}>
+                    <KeyValueVertical label="Uploader Principal" value={<CopyableUIDComponent uid={task.uploader_id.toText()} />} />
+                    <KeyValueVertical label="Operator Principal" value={<CopyableUIDComponent uid={task.operator_id.toText()} />} />
+                    <KeyValueVertical label="Canister Principal" value={<CopyableUIDComponent uid={task.canister_id.toText()} />} />
+                    <KeyValueVertical label="Module Hash" value={task.module_hash} />
+                    <KeyValueVertical label="Argument Candid" value={<Input.TextArea value={task.argument_candid} size="small" readOnly rows={2} />} />
+                </Flex>
+            </Flex>
+        </PanelCard>
     );
-
-    const taskResultInfo: ReactNode = useMemo(() => {
-        if (hasProperty(proposal.state, 'Performed')) {
-            const {result} = proposal.state.Performed;
-            if (hasProperty(result, 'CallResponse')) {
-                const {candid, error, response} = result.CallResponse;
-                const candidText: string = fromNullable(candid) ?? '';
-                const errorText: string = fromNullable(error) ?? '';
-                const responseText: string = toHexString(uint8ToBuf(arrayToUint8Array(response)));
-                return (
-                    <div>
-                        <h3>Call Canister task result</h3>
-                        <Descriptions bordered column={1} size="small">
-                            <Descriptions.Item label="Candid">
-                                <Typography.Paragraph>
-                                    <pre style={{fontSize: '0.8em'}}>{candidText}</pre>
-                                </Typography.Paragraph>
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Error">
-                                <span className="gf-ant-color-error">{errorText}</span>
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Response">
-                                <Typography.Text copyable={{text: responseText}}>{truncateMiddle(responseText, 50)}</Typography.Text>
-                            </Descriptions.Item>
-                        </Descriptions>
-                    </div>
-                );
-            } else if (hasProperty(result, 'Error')) {
-                const {reason} = result.Error;
-                return (
-                    <div>
-                        <h3>Call Canister task result</h3>
-                        <Descriptions bordered column={1} size="small">
-                            <Descriptions.Item label="Error">
-                                <span className="gf-ant-color-error">{reason}</span>
-                            </Descriptions.Item>
-                        </Descriptions>
-                    </div>
-                );
-            } else if (hasProperty(result, 'Done')) {
-                return (
-                    <div>
-                        <h3>Call Canister task result</h3>
-                        <Descriptions bordered column={1} size="small">
-                            <Descriptions.Item label="Status">Done</Descriptions.Item>
-                        </Descriptions>
-                    </div>
-                );
-            }
-        }
-        return null;
-    }, [proposal]);
-
-    const votingConfigurationUpgradeCanister = getGovernanceVotingConfigurationByProposalType('UpgradeCanister');
-    const votingConfig =
-        votingConfigurationUpgradeCanister != undefined ? (
-            <div>
-                <h3>Voting Config</h3>
-                <Descriptions bordered column={1} size="small">
-                    <Descriptions.Item label="CallCanister">
-                        stop_vote_count: {votingConfigurationUpgradeCanister.stop_vote_count} / positive_vote_count: {votingConfigurationUpgradeCanister.positive_vote_count}
-                    </Descriptions.Item>
-                </Descriptions>
-            </div>
-        ) : null;
     return (
-        <Space direction="vertical">
-            {votingConfig}
+        <Flex vertical gap={8}>
+            <ProposalVotingConfigurationPanel proposalType={proposalType} />
             {taskInfo}
-            {taskResultInfo}
-        </Space>
+            <ProposalTaskResultInfo proposal={proposal} proposalType={proposalType} />
+        </Flex>
     );
 };
 
-const ProposalCallCanisterAdditionalInfo = (props: {proposal: Proposal; task: CallCanister}) => {
-    const {proposal, task} = props;
-    const governanceDataContext = useGovernanceDataContext();
+const ProposalCallCanisterAdditionalInfo = (props: {proposal: Proposal; task: CallCanister; proposalType: KeysOfUnion<ProposalType>}) => {
+    const {proposal, task, proposalType} = props;
     const canisterDID: string | undefined = fromNullable(task.canister_did);
+    const payment: bigint | undefined = fromNullable(task.payment);
     const taskInfo = (
-        <div>
-            <h3>Call Canister task</h3>
-            <Descriptions bordered column={1} size="small">
-                <Descriptions.Item label="Canister ID">
-                    <CopyableUIDComponent uid={task.canister_id.toText()} />
-                </Descriptions.Item>
-                <Descriptions.Item label="Method">{task.method}</Descriptions.Item>
-                <Descriptions.Item label="Argument Candid">{task.argument_candid}</Descriptions.Item>
-                <Descriptions.Item label="Canister Candid">
-                    <Input.TextArea value={canisterDID} size="small" readOnly rows={isEmptyString(canisterDID) ? 3 : 7} style={{width: 700}} />
-                </Descriptions.Item>
-            </Descriptions>
-        </div>
+        <PanelCard>
+            <Flex vertical gap={16}>
+                <Typography.Title level={5}>{proposalType} task</Typography.Title>
+                <Flex vertical gap={8}>
+                    <KeyValueVertical label="Canister ID" value={<CopyableUIDComponent uid={task.canister_id.toText()} />} />
+                    <KeyValueVertical label="Method" value={task.method} />
+                    <KeyValueVertical label="Argument Candid" value={<Input.TextArea value={task.argument_candid} size="small" readOnly rows={2} />} />
+                    <KeyValueVertical label="Canister Candid" value={isNullish(canisterDID) ? '-' : <Input.TextArea value={canisterDID} size="small" readOnly rows={2} />} />
+                    <KeyValueVertical label="Payment" value={isNullish(payment) ? '-' : payment.toString()} />
+                </Flex>
+            </Flex>
+        </PanelCard>
     );
 
-    const taskResultInfo: ReactNode = useMemo(() => {
-        if (hasProperty(proposal.state, 'Performed')) {
-            const {result} = proposal.state.Performed;
-            if (hasProperty(result, 'CallResponse')) {
-                const {candid, error, response} = result.CallResponse;
-                const candidText: string = fromNullable(candid) ?? '';
-                const errorText: string = fromNullable(error) ?? '';
-                const responseText: string = toHexString(uint8ToBuf(arrayToUint8Array(response)));
-                return (
-                    <div>
-                        <h3>Call Canister task result</h3>
-                        <Descriptions bordered column={1} size="small">
-                            <Descriptions.Item label="Candid">
-                                <Typography.Paragraph>
-                                    <pre style={{fontSize: '0.8em'}}>{candidText}</pre>
-                                </Typography.Paragraph>
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Error">
-                                <span className="gf-ant-color-error">{errorText}</span>
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Response">
-                                <Typography.Text copyable={{text: responseText}}>{truncateMiddle(responseText, 50)}</Typography.Text>
-                            </Descriptions.Item>
-                        </Descriptions>
-                    </div>
-                );
-            } else if (hasProperty(result, 'Error')) {
-                const {reason} = result.Error;
-                return (
-                    <div>
-                        <h3>Call Canister task result</h3>
-                        <Descriptions bordered column={1} size="small">
-                            <Descriptions.Item label="Error">
-                                <span className="gf-ant-color-error">{reason}</span>
-                            </Descriptions.Item>
-                        </Descriptions>
-                    </div>
-                );
-            }
-        }
-        return null;
-    }, [proposal]);
-
-    const votingConfigurationCallCanister = governanceDataContext.getGovernanceVotingConfigurationByProposalType('CallCanister');
-    const votingConfig =
-        votingConfigurationCallCanister != undefined ? (
-            <div>
-                <h3>Voting Config</h3>
-                <Descriptions bordered column={1} size="small">
-                    <Descriptions.Item label="CallCanister">
-                        stop_vote_count: {votingConfigurationCallCanister.stop_vote_count} / positive_vote_count: {votingConfigurationCallCanister.positive_vote_count}
-                    </Descriptions.Item>
-                </Descriptions>
-            </div>
-        ) : null;
     return (
-        <Space direction="vertical">
-            {votingConfig}
+        <Flex vertical gap={16}>
+            <ProposalVotingConfigurationPanel proposalType={proposalType} />
             {taskInfo}
-            {taskResultInfo}
-        </Space>
+            <ProposalTaskResultInfo proposal={proposal} proposalType={proposalType} />
+        </Flex>
     );
 };
 
 const ProposalVotingInfoAndControls = (props: {proposal: Proposal}) => {
     const {proposal} = props;
+    const {getGovernanceParticipantByPrincipal} = useGovernanceContext();
+
+    const participantName = getGovernanceParticipantByPrincipal(proposal.initiator)?.name;
     return (
-        <Space direction="vertical">
+        <Flex vertical gap={16}>
             {proposal.voting.votes.length == 0 ? <div>No votes</div> : null}
             {proposal.voting.votes.map((vote: Vote, idx) => {
                 return (
-                    <Descriptions bordered column={1} size="small" key={idx}>
-                        <Descriptions.Item label={'Vote #' + (idx + 1)}>
-                            <Space direction="horizontal">
-                                <Tag>{vote.vote ? 'Yes' : 'No'}</Tag>
-                                <span>{formatDateTime(Number(vote.vote_time))}</span>
-                                <CopyableUIDComponent uid={vote.participant.toText()} truncateLength={100} />
-                            </Space>
-                        </Descriptions.Item>
-                    </Descriptions>
+                    <>
+                        <KeyValueVertical
+                            label={`Vote #${idx + 1}`}
+                            gap={8}
+                            value={
+                                <Flex vertical gap={8}>
+                                    <div>{vote.vote ? '✅ Yes' : '❌ No'}</div>
+                                    <div>
+                                        <DateTimeComponent timeMillis={vote.vote_time} />
+                                        <div className="gf-font-size-smaller">{formatDateAgo(Number(vote.vote_time))}</div>
+                                    </div>
+                                    <div>
+                                        <CopyableUIDComponent uid={vote.participant.toText()} />
+                                        {nonNullish(participantName) ? <div>{participantName}</div> : null}
+                                    </div>
+                                </Flex>
+                            }
+                        />
+                    </>
                 );
             })}
             <OurVoteControls proposal={proposal} />
             <OurPerformControls proposal={proposal} />
-        </Space>
+        </Flex>
     );
+};
+
+const ProposalVotingConfigurationPanel = (props: {proposalType: KeysOfUnion<ProposalType>}) => {
+    const {proposalType} = props;
+    const {getGovernanceVotingConfigurationByProposalType} = useGovernanceContext();
+
+    const votingConfigurationUpdateGovernance = getGovernanceVotingConfigurationByProposalType(proposalType);
+    if (isNullish(votingConfigurationUpdateGovernance)) {
+        return null;
+    }
+    return (
+        <PanelCard>
+            <Flex vertical gap={16}>
+                <Typography.Title level={5}>Voting Config</Typography.Title>
+                <KeyValueVertical
+                    gap={4}
+                    label={proposalType}
+                    value={
+                        <Flex gap={8}>
+                            <Tag>{`Stop votes: ${votingConfigurationUpdateGovernance.stop_vote_count}`}</Tag>
+                            <Tag>{`Positive votes: ${votingConfigurationUpdateGovernance.positive_vote_count}`}</Tag>
+                        </Flex>
+                    }
+                />
+            </Flex>
+        </PanelCard>
+    );
+};
+
+const ProposalTaskResultInfo = (props: {proposal: Proposal; proposalType: KeysOfUnion<ProposalDetail>}) => {
+    const {proposal, proposalType} = props;
+    if (hasProperty(proposal.state, 'Performed')) {
+        const {result} = proposal.state.Performed;
+        if (hasProperty(result, 'CallResponse')) {
+            const {candid, error, response} = result.CallResponse;
+            const candidText: string | undefined = fromNullable(candid);
+            const errorText: string | undefined = fromNullable(error);
+            const responseText: string = toHexString(uint8ToBuf(arrayToUint8Array(response)));
+            return (
+                <PanelCard>
+                    <Flex vertical gap={16}>
+                        <Typography.Title level={5}>{proposalType} task result</Typography.Title>
+                        <Flex vertical gap={8}>
+                            <KeyValueVertical label="Response" value={<Input.TextArea value={responseText} size="small" readOnly rows={3} />} />
+                            {nonNullish(candidText) ? <KeyValueVertical label="Candid" value={<Input.TextArea value={candidText} size="small" readOnly rows={5} />} /> : null}
+                            {nonNullish(errorText) ? (
+                                <KeyValueVertical label="Error" value={<Input.TextArea value={errorText} size="small" readOnly rows={5} className="gf-ant-color-error" />} />
+                            ) : null}
+                        </Flex>
+                    </Flex>
+                </PanelCard>
+            );
+        } else if (hasProperty(result, 'Error')) {
+            const {reason} = result.Error;
+            return (
+                <PanelCard>
+                    <Flex vertical gap={16}>
+                        <Typography.Title level={5}>{proposalType} task result</Typography.Title>
+                        <KeyValueVertical label="Error" value={<Input.TextArea value={reason} size="small" readOnly rows={5} className="gf-ant-color-error" />} />
+                    </Flex>
+                </PanelCard>
+            );
+        } else if (hasProperty(result, 'Done')) {
+            return (
+                <PanelCard>
+                    <Flex vertical gap={16}>
+                        <Typography.Title level={5}>{proposalType} task result</Typography.Title>
+                        <KeyValueVertical label="Status" value="Done" />
+                    </Flex>
+                </PanelCard>
+            );
+        }
+    }
+    return null;
 };

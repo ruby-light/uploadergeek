@@ -1,9 +1,9 @@
 import {isNullish} from '@dfinity/utils';
-import {useGovernanceDataContext} from '../data/GovernanceDataProvider';
+import {useGovernanceContext} from '../../../context/governance/GovernanceProvider';
 import {GovernanceInfo} from './GovernanceInfo';
 
 export const CurrentGovernanceInfo = () => {
-    const {governance} = useGovernanceDataContext();
+    const {governance} = useGovernanceContext();
     if (isNullish(governance)) {
         return null;
     }

@@ -3,9 +3,12 @@ import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGoverna
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import type {Feature} from 'frontend/src/utils/core/feature/feature';
 import {hasProperty, type KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
+import {IS_DEV_ENVIRONMENT} from 'frontend/src/utils/env';
 import type {PropsWithChildren} from 'react';
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import type {Governance, GovernanceParticipant, ProposalType, VotingConfig} from 'src/declarations/governance/governance.did';
+
+export const FETCH_CURRENT_GOVERNANCE_NOTIFICATION = 'FETCH_CURRENT_GOVERNANCE_NOTIFICATION';
 
 type FetchGovernance = () => Promise<void>;
 type GetGovernanceParticipantByPrincipal = (principal: Principal) => GovernanceParticipant | undefined;
@@ -20,21 +23,39 @@ type Context = {
 };
 
 const GovernanceDataContext = React.createContext<Context | undefined>(undefined);
-export const useGovernanceDataContext = () => {
+export const useGovernanceContext = () => {
     const context = React.useContext<Context | undefined>(GovernanceDataContext);
     if (!context) {
-        throw new Error('useGovernanceDataContext must be used within a GovernanceDataContext.Provider');
+        throw new Error('useGovernanceContext must be used within a GovernanceContext.Provider');
     }
     return context;
 };
 
-export const GovernanceDataProvider = (props: PropsWithChildren<any>) => {
+export const GovernanceProvider = (props: PropsWithChildren<any>) => {
     const {call, data, feature} = useICCanisterCallGovernance('getGovernance');
     const governance = data?.governance;
 
     const fetchGovernance = useCallback(async () => {
-        await call([], {logger: apiLogger, logMessagePrefix: 'getGovernance:'});
+        await call([], {
+            logger: apiLogger,
+            logMessagePrefix: 'getGovernance:',
+            onBeforeRequest: async () => {
+                if (IS_DEV_ENVIRONMENT) {
+                    // await delayPromise(1000);
+                    // throw new Error(`Simulated error in dev environment ${Date.now()}`);
+                }
+            }
+        });
     }, [call]);
+
+    useEffect(() => {
+        const token = PubSub.subscribe(FETCH_CURRENT_GOVERNANCE_NOTIFICATION, () => {
+            fetchGovernance();
+        });
+        return () => {
+            PubSub.unsubscribe(token);
+        };
+    }, [fetchGovernance]);
 
     const getGovernanceParticipantByPrincipal = useCallback<GetGovernanceParticipantByPrincipal>(
         (principal: Principal) => {

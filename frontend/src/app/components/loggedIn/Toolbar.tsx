@@ -9,7 +9,7 @@ import {LogoutButton} from './LogoutButton';
 export const Toolbar = () => {
     const {myGovernanceParticipant} = useMyGovernanceParticipantContextSafe();
     const {principal: currentPrincipal} = useAuthContext();
-    const currentPrincipalComponent = isNullish(currentPrincipal) ? null : <CopyableUIDComponent uid={currentPrincipal.toText()} truncateLength={100} />;
+    const currentPrincipalComponent = isNullish(currentPrincipal) ? null : <CopyableUIDComponent uid={currentPrincipal.toText()} />;
 
     return (
         <Space direction="vertical" size={0}>

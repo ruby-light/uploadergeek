@@ -1,5 +1,5 @@
-import {Space, Table, Tag} from 'antd';
-import {jsonStringify} from 'frontend/src/utils/core/json/json';
+import {Flex, Tag} from 'antd';
+import {KeyValueHorizontal} from 'frontend/src/components/widgets/KeyValueHorizontal';
 import type {KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 
@@ -15,7 +15,7 @@ type TableItemType = {
     proposalPermissions: Array<KeysOfUnion<ProposalPermission>>;
 };
 
-export const ParticipantPermissionTable = (props: Props) => {
+export const ParticipantPermissions = (props: Props) => {
     const {proposalPermissions} = props;
 
     const dataSource: Array<TableItemType> = useMemo(() => {
@@ -30,24 +30,22 @@ export const ParticipantPermissionTable = (props: Props) => {
     }, [proposalPermissions]);
 
     return (
-        <Space direction="vertical" size="small">
-            <h2>User Permissions:</h2>
-            <Table<TableItemType> dataSource={dataSource} rowKey={(record) => jsonStringify(record)} size="small" pagination={false}>
-                <Table.Column<TableItemType> title="Proposal Type" dataIndex="proposalType" key="proposalType" />
-                <Table.Column<TableItemType>
-                    title="Proposal Permissions"
-                    key="proposalPermissions"
-                    render={(record: TableItemType) => {
-                        return (
-                            <Space direction="horizontal">
-                                {record.proposalPermissions.map((v) => (
-                                    <Tag key={v}>{v}</Tag>
+        <>
+            {dataSource.map((value, index) => {
+                return (
+                    <KeyValueHorizontal
+                        key={index}
+                        label={value.proposalType}
+                        value={
+                            <Flex gap={8}>
+                                {value.proposalPermissions.map((v, idx) => (
+                                    <Tag key={idx}>{v}</Tag>
                                 ))}
-                            </Space>
-                        );
-                    }}
-                />
-            </Table>
-        </Space>
+                            </Flex>
+                        }
+                    />
+                );
+            })}
+        </>
     );
 };

@@ -1,8 +1,9 @@
 import {Principal} from '@dfinity/principal';
 import {isEmptyString, nonNullish, toNullable} from '@dfinity/utils';
-import {Button, Form, Input, Modal, Space} from 'antd';
+import {Button, Flex, Form, Input, Modal, Space} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
+import {REFRESH_PROPOSALS_TOPIC} from 'frontend/src/context/governance/proposals/ProposalsProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {isCanisterPrincipalValid, isPrincipalValid} from 'frontend/src/utils/ic/principal';
@@ -12,7 +13,6 @@ import type {Reducer} from 'react';
 import {useReducer} from 'react';
 import type {AddNewProposalArgs, ProposalDetail} from 'src/declarations/governance/governance.did';
 import type {ModalButtonProps, ModalProps} from '../../common/ModalCommon';
-import {REFRESH_PROPOSALS_TOPIC} from '../ProposalsSection';
 
 export type FormValuesType = {
     uploaderId: string;
@@ -216,25 +216,23 @@ export const AddProposalUpgradeCanisterModalComponent = (props: Props) => {
                         ]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item label="Module Hash" name="moduleHash" rules={[{required: true, message: 'Missing module hash'}]}>
+                    <Form.Item label="Module Hash" name="moduleHash" rules={[{required: true, message: 'Invalid module hash'}]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item label="Argument Candid" name="argumentCandid" rules={[{required: true, message: 'Missing argument candid'}]}>
+                    <Form.Item label="Argument Candid" name="argumentCandid" rules={[{required: true, message: 'Invalid argument candid'}]}>
                         <Input.TextArea />
                     </Form.Item>
                     <Form.Item label="Description" name="description">
                         <Input.TextArea />
                     </Form.Item>
-                    <Space style={{width: '100%', justifyContent: 'end'}}>
+                    <Flex justify="end" gap={8}>
                         <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>
                             Cancel
                         </Button>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>
-                                Submit
-                            </Button>
-                        </Form.Item>
-                    </Space>
+                        <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>
+                            Submit
+                        </Button>
+                    </Flex>
                 </Space>
             </Form>
         </Modal>

@@ -28,6 +28,9 @@ export const OurVoteControls = (props: Props) => {
         if (isNullish(currentPrincipal)) {
             return false;
         }
+        if (!hasProperty(proposal.state, 'Voting')) {
+            return false;
+        }
         return !proposal.voting.votes.some((v) => {
             return v.participant.compareTo(currentPrincipal) === 'eq';
         });

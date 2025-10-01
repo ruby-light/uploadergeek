@@ -1,9 +1,10 @@
 import {MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
 import {Principal} from '@dfinity/principal';
 import {isEmptyString, nonNullish, toNullable} from '@dfinity/utils';
-import {Button, Card, Col, Form, Input, InputNumber, Modal, Row, Select, Space} from 'antd';
+import {Button, Card, Col, Flex, Form, Input, InputNumber, Modal, Row, Select, Space} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
+import {REFRESH_PROPOSALS_TOPIC} from 'frontend/src/context/governance/proposals/ProposalsProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import type {KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
@@ -14,7 +15,6 @@ import type {Reducer} from 'react';
 import {useReducer} from 'react';
 import type {AddNewProposalArgs, GovernanceParticipant, ProposalDetail, ProposalPermission, ProposalType, VotingConfig} from 'src/declarations/governance/governance.did';
 import type {ModalButtonProps, ModalProps} from '../../common/ModalCommon';
-import {REFRESH_PROPOSALS_TOPIC} from '../ProposalsSection';
 
 export type FormValuesTypeParticipantPermission = {
     proposalType: KeysOfUnion<ProposalType>;
@@ -67,7 +67,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
         ...initialValues
     };
 
-    const title = `Create a new "Upgrade Governance" proposal`;
+    const title = `Create a new "Update Governance" proposal`;
 
     const okText = 'Create';
     const errorText = 'Proposal cannot be created. Please try again later.';
@@ -192,7 +192,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                             {...votingConfigField}
                                                             label="Proposal Type"
                                                             name={[votingConfigField.name, 'proposalType']}
-                                                            rules={[{required: true, message: 'Missing proposalType'}]}>
+                                                            rules={[{required: true, message: 'Invalid proposal type'}]}>
                                                             <Select style={{width: 200}}>
                                                                 {(['UpdateGovernance', 'UpgradeCanister', 'CallCanister'] as Array<KeysOfUnion<ProposalType>>).map((item) => (
                                                                     <Select.Option key={item} value={item}>
@@ -210,7 +210,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                 {...votingConfigField}
                                                                 label="Number of Votes"
                                                                 name={[votingConfigField.name, 'numberOfVotes']}
-                                                                rules={[{required: true, message: 'Missing number of votes'}]}>
+                                                                rules={[{required: true, message: 'Invalid number of votes'}]}>
                                                                 <InputNumber />
                                                             </Form.Item>
                                                         );
@@ -223,7 +223,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                 {...votingConfigField}
                                                                 label="Positive Votes Required"
                                                                 name={[votingConfigField.name, 'numberOfVotesRequired']}
-                                                                rules={[{required: true, message: 'Missing positive votes required'}]}>
+                                                                rules={[{required: true, message: 'Invalid number of votes'}]}>
                                                                 <InputNumber />
                                                             </Form.Item>
                                                         );
@@ -275,7 +275,6 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                     label="Principal"
                                                                     name={[participantsField.name, 'principal']}
                                                                     rules={[
-                                                                        {required: true, message: 'Missing principal'},
                                                                         {
                                                                             validator: async (_, principal) => {
                                                                                 const principalValid = isPrincipalValid(principal);
@@ -299,7 +298,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                         {...participantsField}
                                                                         label="Name"
                                                                         name={[participantsField.name, 'name']}
-                                                                        rules={[{required: true, message: 'Missing name'}]}
+                                                                        rules={[{required: true, message: 'Invalid name'}]}
                                                                         wrapperCol={{span: 24}}>
                                                                         <Input style={{width: '100%'}} />
                                                                     </Form.Item>
@@ -319,7 +318,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                                         {...proposalPermissionField}
                                                                                         label="Proposal Type"
                                                                                         name={[proposalPermissionField.name, 'proposalType']}
-                                                                                        rules={[{required: true, message: 'Missing proposalType'}]}>
+                                                                                        rules={[{required: true, message: 'Invalid proposal type'}]}>
                                                                                         <Select style={{width: 200}}>
                                                                                             {(['UpdateGovernance', 'UpgradeCanister', 'CallCanister'] as Array<KeysOfUnion<ProposalType>>).map(
                                                                                                 (item) => (
@@ -339,7 +338,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                                                                                             {...proposalPermissionField}
                                                                                             label="Proposal Permissions"
                                                                                             name={[proposalPermissionField.name, 'permissions']}
-                                                                                            rules={[{required: true, message: 'Missing permissions'}]}>
+                                                                                            rules={[{required: true, message: 'Invalid permissions'}]}>
                                                                                             <Select style={{width: 250}} mode="multiple">
                                                                                                 {['Add', 'Vote', 'Perform'].map((item) => (
                                                                                                     <Select.Option key={item} value={item}>
@@ -387,16 +386,14 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                             </Form.Item>
                         </Col>
                         <Col span={24}>
-                            <Space style={{width: '100%', justifyContent: 'end'}}>
+                            <Flex justify="end" gap={8}>
                                 <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>
                                     Cancel
                                 </Button>
-                                <Form.Item>
-                                    <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>
-                                        Submit
-                                    </Button>
-                                </Form.Item>
-                            </Space>
+                                <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>
+                                    Submit
+                                </Button>
+                            </Flex>
                         </Col>
                     </Row>
                 </Form>

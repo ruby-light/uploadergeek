@@ -21,6 +21,10 @@ dayjs.utc();
 const DATE_FORMAT = 'YYYY/MM/DD';
 const TIME_FORMAT = 'HH:mm:ss';
 
+export const formatDateAgo = (timeMillis: number, withoutSuffix?: boolean) => {
+    return dayjs(timeMillis).utc().fromNow(withoutSuffix);
+};
+
 export const formatDateTime = (timeMillis: number) => {
     return dayjs(timeMillis).utc().format(`${DATE_FORMAT} ${TIME_FORMAT}`);
 };

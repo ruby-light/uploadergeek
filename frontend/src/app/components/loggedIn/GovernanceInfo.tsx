@@ -1,78 +1,97 @@
-import {Descriptions, Space, Tag} from 'antd';
+import {Divider, Flex, Tag, Typography} from 'antd';
+import {KeyValueVertical} from 'frontend/src/components/widgets/KeyValueVertical';
+import {PanelCard} from 'frontend/src/components/widgets/PanelCard';
 import {CopyableUIDComponent} from 'frontend/src/components/widgets/uid/CopyableUIDComponent';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 import type {ReactNode} from 'react';
 import type {Governance, GovernanceParticipant} from 'src/declarations/governance/governance.did';
 
-export const GovernanceInfo = (props: {governance: Governance; title: ReactNode}) => {
-    const {governance, title} = props;
+export const GovernanceInfo = (props: {governance: Governance; title: ReactNode; titleLevel?: 4 | 5}) => {
+    const {governance, title, titleLevel = 4} = props;
     return (
-        <Space direction="vertical" size="small">
-            <h2>{title}</h2>
-            <Space direction="vertical">
-                <GovernanceVotingConfig governance={governance} />
-                <GovernanceParticipants governance={governance} />
-            </Space>
-        </Space>
+        <>
+            <PanelCard>
+                <Flex vertical gap={32}>
+                    <Typography.Title level={titleLevel}>{title}</Typography.Title>
+                    <GovernanceVotingConfig governance={governance} />
+                    <GovernanceParticipants governance={governance} />
+                </Flex>
+            </PanelCard>
+        </>
     );
 };
 
 export const GovernanceVotingConfig = (props: {governance: Governance}) => {
     const {governance} = props;
     return (
-        <div>
-            <h3>Voting Config</h3>
-            <Descriptions bordered column={1} size="small">
-                {governance.voting_configuration.map((value, index) => {
-                    const proposalType = value[0];
-                    const votingConfig = value[1];
-                    return (
-                        <Descriptions.Item label={<>{getICFirstKey(proposalType)}</>} key={index}>
-                            stop_vote_count: {votingConfig.stop_vote_count} / positive_vote_count: {votingConfig.positive_vote_count}
-                        </Descriptions.Item>
-                    );
-                })}
-            </Descriptions>
-        </div>
+        <Flex vertical gap={8}>
+            <Typography.Title level={5}>Voting Config</Typography.Title>
+            {governance.voting_configuration.map((value, index) => {
+                const proposalType = value[0];
+                const votingConfig = value[1];
+                return (
+                    <KeyValueVertical
+                        key={index}
+                        gap={4}
+                        label={getICFirstKey(proposalType)}
+                        value={
+                            <Flex gap={8}>
+                                <Tag>{`Stop votes: ${votingConfig.stop_vote_count}`}</Tag>
+                                <Tag>{`Positive votes: ${votingConfig.positive_vote_count}`}</Tag>
+                            </Flex>
+                        }
+                    />
+                );
+            })}
+        </Flex>
     );
 };
 
 const GovernanceParticipants = (props: {governance: Governance}) => {
     const {governance} = props;
     return (
-        <div>
-            <h3>Participants</h3>
-            <Space direction="vertical">
+        <Flex vertical gap={8}>
+            <Typography.Title level={5}>Participants</Typography.Title>
+            <Flex vertical gap={8}>
                 {governance.participants.map((value, idx) => {
                     const principal = value[0];
                     const participant: GovernanceParticipant = value[1];
                     return (
-                        <Space direction="vertical" size="small" key={idx}>
-                            <CopyableUIDComponent uid={principal.toText()} truncateLength={100} />
-                            <Descriptions bordered column={1} size="small">
-                                <Descriptions.Item label="Name">{participant.name}</Descriptions.Item>
-                                <Descriptions.Item label="Permissions">
-                                    <Descriptions bordered column={1} size="small">
-                                        {participant.proposal_permissions.map((value, index) => {
-                                            const proposalType = value[0];
-                                            const proposalPermission = value[1];
-                                            return (
-                                                <Descriptions.Item label={<>{getICFirstKey(proposalType)}</>} key={index}>
-                                                    <Space direction="horizontal">
-                                                        {proposalPermission.map((v, idx) => (
-                                                            <Tag key={idx}>{getICFirstKey(v)}</Tag>
-                                                        ))}
-                                                    </Space>
-                                                </Descriptions.Item>
-                                            );
-                                        })}
-                                    </Descriptions>
-                                </Descriptions.Item>
-                            </Descriptions>
-                        </Space>
+                        <>
+                            <Flex vertical gap={8} key={idx}>
+                                <KeyValueVertical
+                                    label="Participant"
+                                    value={
+                                        <Flex vertical>
+                                            <CopyableUIDComponent uid={principal.toText()} />
+                                            <span>{participant.name}</span>
+                                        </Flex>
+                                    }
+                                />
+                                {participant.proposal_permissions.map((value, index) => {
+                                    const proposalType = value[0];
+                                    const proposalPermission = value[1];
+                                    return (
+                                        <KeyValueVertical
+                                            key={index}
+                                            gap={4}
+                                            label={getICFirstKey(proposalType)}
+                                            value={
+                                                <Flex gap={8}>
+                                                    {proposalPermission.map((v, idx) => (
+                                                        <Tag key={idx}>{getICFirstKey(v)}</Tag>
+                                                    ))}
+                                                </Flex>
+                                            }
+                                        />
+                                    );
+                                })}
+                            </Flex>
+                            <Divider size="small" />
+                        </>
                     );
                 })}
-            </Space>
-        </div>
+            </Flex>
+        </Flex>
     );
 };

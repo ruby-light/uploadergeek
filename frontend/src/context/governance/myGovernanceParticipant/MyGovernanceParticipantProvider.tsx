@@ -1,13 +1,14 @@
 import {isNullish} from '@dfinity/utils';
 import type {GovernanceCanister} from 'frontend/src/api/hub/GovernanceCanister';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
-import {apiLogger} from 'frontend/src/context/logger/logger';
 import type {Feature} from 'frontend/src/utils/core/feature/feature';
 import {hasProperty, type KeysOfUnion, type WithoutUndefined} from 'frontend/src/utils/core/typescript/typescriptAddons';
-import type {ICCall, ICErr} from 'frontend/src/utils/ic/api/useICCallTypedFor';
+import type {ICErr} from 'frontend/src/utils/ic/api/useICCallTypedFor';
 
-import {createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo} from 'react';
+import {IS_DEV_ENVIRONMENT} from 'frontend/src/utils/env';
+import {createContext, type PropsWithChildren, useCallback, useContext, useMemo} from 'react';
 import type {GovernanceParticipant, ProposalPermission, ProposalType} from 'src/declarations/governance/governance.did';
+import {apiLogger} from '../../logger/logger';
 
 type HasProposalPermission = (proposalType: KeysOfUnion<ProposalType>, proposalPermission: KeysOfUnion<ProposalPermission>) => boolean;
 
@@ -15,7 +16,7 @@ type Context = {
     myGovernanceParticipant: GovernanceParticipant | undefined;
     feature: Feature;
     responseError: ICErr<GovernanceCanister, 'getMyGovernanceParticipant'> | undefined;
-    fetchMyGovernanceParticipant: ICCall<GovernanceCanister, 'getMyGovernanceParticipant'>;
+    fetchMyGovernanceParticipant: () => Promise<void>;
     hasProposalPermission: HasProposalPermission;
 };
 
@@ -39,7 +40,20 @@ export const useMyGovernanceParticipantContextSafe = () => {
 };
 
 export const MyGovernanceParticipantProvider = (props: PropsWithChildren<any>) => {
-    const {call: fetchMyGovernanceParticipant, data: myGovernanceParticipant, feature, responseError} = useICCanisterCallGovernance('getMyGovernanceParticipant');
+    const {call, data: myGovernanceParticipant, feature, responseError} = useICCanisterCallGovernance('getMyGovernanceParticipant');
+
+    const fetchMyGovernanceParticipant = useCallback(async () => {
+        await call([], {
+            logger: apiLogger,
+            logMessagePrefix: 'getGovernance:',
+            onBeforeRequest: async () => {
+                if (IS_DEV_ENVIRONMENT) {
+                    // await delayPromise(1000);
+                    // throw new Error(`Simulated error in dev environment ${Date.now()}`);
+                }
+            }
+        });
+    }, [call]);
 
     const hasProposalPermission = useCallback<HasProposalPermission>(
         (proposalType, proposalPermission) => {
@@ -54,10 +68,6 @@ export const MyGovernanceParticipantProvider = (props: PropsWithChildren<any>) =
         },
         [myGovernanceParticipant?.participant?.proposal_permissions]
     );
-
-    useEffect(() => {
-        fetchMyGovernanceParticipant([], {logger: apiLogger, logMessagePrefix: `getMyGovernanceParticipant:`});
-    }, [fetchMyGovernanceParticipant]);
 
     const value: Context = useMemo<Context>(
         () => ({

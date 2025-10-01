@@ -39,7 +39,7 @@ export const AddProposalCallCanisterModalButton = (props: Props) => {
     return (
         <>
             <AddProposalCallCanisterModalComponent key={`addProposal${modalVisible.nonce}`} visible={modalVisible.visible} onDestroy={onModalDestroy} initialValues={initialValues} />
-            <Button onClick={onClick} icon={icon}>
+            <Button onClick={onClick} icon={icon} size="small">
                 {label}
             </Button>
         </>

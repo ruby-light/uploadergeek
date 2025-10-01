@@ -31,7 +31,7 @@ const CopyProposalUpdateGovernanceButton = (props: {proposal: Proposal; governan
     const initialValues = transformICGovernanceToFormValues(props.governance, fromNullable(proposal.description));
     return (
         <>
-            <AddProposalUpdateGovernanceModalButton label="Copy Proposal UpdateGovernance" initialValues={initialValues} icon={<CopyOutlined />} />
+            <AddProposalUpdateGovernanceModalButton label="Copy" initialValues={initialValues} icon={<CopyOutlined />} />
         </>
     );
 };
@@ -41,7 +41,7 @@ const CopyProposalUpgradeCanisterButton = (props: {proposal: Proposal; task: Upg
     const initialValues = transformUpgradeCanisterTaskToFormValues(props.task, fromNullable(proposal.description));
     return (
         <>
-            <AddProposalUpgradeCanisterModalButton label="Copy Proposal UpgradeCanister" initialValues={initialValues} icon={<CopyOutlined />} />
+            <AddProposalUpgradeCanisterModalButton label="Copy" initialValues={initialValues} icon={<CopyOutlined />} />
         </>
     );
 };
@@ -51,7 +51,7 @@ const CopyProposalCallCanisterButton = (props: {proposal: Proposal; task: CallCa
     const initialValues = transformCallCanisterTaskToFormValues(props.task, fromNullable(proposal.description));
     return (
         <>
-            <AddProposalCallCanisterModalButton label="Copy Proposal CallCanister" initialValues={initialValues} icon={<CopyOutlined />} />
+            <AddProposalCallCanisterModalButton label="Copy" initialValues={initialValues} icon={<CopyOutlined />} />
         </>
     );
 };

@@ -142,6 +142,10 @@ Form
     color: var(--ant-color-text-disabled);
 }
 
+.ant-form-item-explain-error {
+    color: var(--ant-color-error-text);
+}
+
 /**
 ==========================================
 Input
