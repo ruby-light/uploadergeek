@@ -21,8 +21,10 @@ const rawI18 = {
             insufficientBalance: 'Insufficient balance',
             keyValueFailedToLoad: 'Failed to load'
         },
-        yes: 'Yes',
-        no: 'No'
+        vote: {
+            approve: 'Approve',
+            decline: 'Decline'
+        }
     },
     auth: {
         disconnect: {

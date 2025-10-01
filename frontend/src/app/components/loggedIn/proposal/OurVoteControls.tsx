@@ -66,20 +66,23 @@ export const OurVoteControls = (props: Props) => {
             ) : null;
         return (
             <Space>
-                <span>Please vote:</span>
                 <Popconfirm
                     title="Are you sure to vote YES?"
                     okButtonProps={{loading: inProgress, disabled: inProgress}}
                     cancelButtonProps={{loading: inProgress, disabled: inProgress}}
                     onConfirm={() => sendVote(true)}>
-                    <Button>Yes</Button>
+                    <Button color="green" variant="solid">
+                        Approve
+                    </Button>
                 </Popconfirm>
                 <Popconfirm
                     title="Are you sure to vote NO?"
                     okButtonProps={{loading: inProgress, disabled: inProgress}}
                     cancelButtonProps={{loading: inProgress, disabled: inProgress}}
                     onConfirm={() => sendVote(false)}>
-                    <Button>No</Button>
+                    <Button color="red" variant="solid">
+                        Decline
+                    </Button>
                 </Popconfirm>
                 {errorPanel}
             </Space>

@@ -1,3 +1,4 @@
+import {RocketOutlined} from '@ant-design/icons';
 import {nonNullish} from '@dfinity/utils';
 import {Button, Popconfirm, Space} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
@@ -73,7 +74,9 @@ export const OurPerformControls = (props: Props) => {
                 okButtonProps={{loading: inProgress, disabled: inProgress}}
                 cancelButtonProps={{loading: inProgress, disabled: inProgress}}
                 onConfirm={() => sendPerform()}>
-                <Button>Perform</Button>
+                <Button icon={<RocketOutlined />} color="blue" variant="solid">
+                    Perform
+                </Button>
             </Popconfirm>
             {errorPanel}
         </Space>

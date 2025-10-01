@@ -1,4 +1,4 @@
-import {fromNullable, isNullish} from '@dfinity/utils';
+import {fromNullable} from '@dfinity/utils';
 import {Flex, Table, Tag, type TableColumnsType, type TablePaginationConfig, type TableProps} from 'antd';
 import type {FilterValue, SorterResult} from 'antd/es/table/interface';
 import {AlertActionButton} from 'frontend/src/components/widgets/alert/AlertActionButton';
@@ -6,13 +6,12 @@ import {ErrorAlertWithAction} from 'frontend/src/components/widgets/alert/ErrorA
 import {PanelLoadingComponent} from 'frontend/src/components/widgets/PanelLoadingComponent';
 import {useGovernanceContext} from 'frontend/src/context/governance/GovernanceProvider';
 import {useProposalsProviderContext, type RemoteDataItemType} from 'frontend/src/context/governance/proposals/ProposalsProvider';
-import {applicationLogger} from 'frontend/src/context/logger/logger';
-import {exhaustiveCheckFailedMessage} from 'frontend/src/context/logger/loggerConstants';
 import {prepareTableParamsFiltersFromTableOnChange, prepareTableParamsSortItemsFromTableOnChange, type ListState} from 'frontend/src/hook/useRemoteListWithUrlState';
 import {i18} from 'frontend/src/i18';
 import {compactArray, isEmptyArray} from 'frontend/src/utils/core/array/array';
 import {formatDateAgo} from 'frontend/src/utils/core/date/format';
 import {extractValidPositiveInteger} from 'frontend/src/utils/core/number/transform';
+import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 import {useCallback, useMemo} from 'react';
 import {Link} from 'react-router-dom';
@@ -52,31 +51,22 @@ export const ProposalsTable = () => {
             {
                 title: 'State',
                 render: (record: TableItemType) => {
-                    const stateKey = getICFirstKey(record.proposal.state);
-                    if (isNullish(stateKey)) {
-                        return '-';
+                    if (hasProperty(record.proposal.state, 'Voting')) {
+                        const votes = isEmptyArray(record.proposal.voting.votes) ? 'no votes' : `${record.proposal.voting.votes.length} votes`;
+                        return (
+                            <Flex vertical>
+                                <span>Voting</span>
+                                <span className="gf-ant-color-secondary gf-font-size-smaller">{votes}</span>
+                            </Flex>
+                        );
+                    } else if (hasProperty(record.proposal.state, 'Approved')) {
+                        return <Tag color="blue">Approved</Tag>;
+                    } else if (hasProperty(record.proposal.state, 'Declined')) {
+                        return <Tag color="red">Declined</Tag>;
+                    } else if (hasProperty(record.proposal.state, 'Performed')) {
+                        return <Tag color="green">Performed</Tag>;
                     }
-                    /**
-                     * export type ProposalState = { 'Approved' : null } |
-                       { 'Voting' : null } |
-                       { 'Declined' : null } |
-                       { 'Performed' : { 'result' : PerformResult } };
-                     */
-                    switch (stateKey) {
-                        case 'Voting':
-                            return 'Voting'; //<Tag color="blue">⏳ Voting</Tag>;
-                        case 'Approved':
-                            return 'Approved';
-                        case 'Performed':
-                            return <Tag color="green">Performed</Tag>;
-                        case 'Declined':
-                            return <Tag color="red">Declined</Tag>;
-                        default: {
-                            const exhaustiveCheck: never = stateKey;
-                            applicationLogger.error(exhaustiveCheckFailedMessage, exhaustiveCheck);
-                            return '-';
-                        }
-                    }
+                    return '-';
                 }
             },
             {

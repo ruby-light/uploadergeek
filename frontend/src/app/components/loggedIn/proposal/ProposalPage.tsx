@@ -17,6 +17,7 @@ import {KeyValueVertical} from 'frontend/src/components/widgets/KeyValueVertical
 import {PanelCard} from 'frontend/src/components/widgets/PanelCard';
 import {PanelHeader} from 'frontend/src/components/widgets/PanelHeader';
 import {AbstractStubPage} from 'frontend/src/components/widgets/stub/AbstractStubPage';
+import {i18} from 'frontend/src/i18';
 import {IS_DEV_ENVIRONMENT} from 'frontend/src/utils/env';
 import PubSub from 'pubsub-js';
 import {useCallback, useEffect} from 'react';
@@ -235,7 +236,7 @@ const ProposalVotingInfoAndControls = (props: {proposal: Proposal}) => {
                             gap={8}
                             value={
                                 <Flex vertical gap={8}>
-                                    <div>{vote.vote ? '✅ Yes' : '❌ No'}</div>
+                                    <div>{vote.vote ? <Tag color="green">{i18.common.vote.approve}</Tag> : <Tag color="red">{i18.common.vote.decline}</Tag>}</div>
                                     <div>
                                         <DateTimeComponent timeMillis={vote.vote_time} />
                                         <div className="gf-font-size-smaller">{formatDateAgo(Number(vote.vote_time))}</div>
