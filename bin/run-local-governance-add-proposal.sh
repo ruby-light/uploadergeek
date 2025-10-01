@@ -4,9 +4,9 @@ set -euo pipefail
 . ./bin/utils.sh
 
 NETWORK_ALIAS=local
-IDENTITY=default
+IDENTITY=rubysparklabs
 
-PRINCIPAL="ziqcz-ouk4n-ez2ek-bmwra-k2w7l-iimo6-2scbu-6nbip-hk6na-fnh43-zqe"
+PRINCIPAL="jwpmd-3t5iy-5yyxk-iq2mr-ukyje-yzatw-kspmh-io23i-hb3kn-5lnzs-rqe"
 
 header "Create governance proposal to add '${PRINCIPAL}' in network '${NETWORK_ALIAS}' using identity '${IDENTITY}'"
 
@@ -29,8 +29,8 @@ VOTING_CONFIGURATION="vec {record{variant{UpdateGovernance};record{stop_vote_cou
 NEW_GOVERNANCE="record{participants=${PARTICIPANTS}; voting_configuration=${VOTING_CONFIGURATION}}"
 
 #1. Create proposal
-#dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance add_new_proposal "(record{proposal_detail=variant {UpdateGovernance = record{new_governance=${NEW_GOVERNANCE}}}})"
+dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance add_new_proposal "(record{proposal_detail=variant {UpdateGovernance = record{new_governance=${NEW_GOVERNANCE}}}})"
 #2. Vote proposal
-#dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance vote_for_proposal "(record{vote=true;proposal_id=1})"
+dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance vote_for_proposal "(record{vote=true;proposal_id=1})"
 #3. Perform proposal
-#dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance perform_proposal "(record{proposal_id=1})"
+dfx canister --identity "$IDENTITY" --network "${NETWORK_ALIAS}" call governance perform_proposal "(record{proposal_id=1})"

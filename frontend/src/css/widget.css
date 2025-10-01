@@ -1,0 +1,50 @@
+/**
+==========================================
+Antd Skeleton
+==========================================
+*/
+
+.gf-skeleton-button {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.gf-skeleton-button .ant-skeleton .ant-skeleton-button {
+    --ant-control-height: 22px;
+    min-width: revert;
+}
+
+.gf-skeleton-button-sm .ant-skeleton .ant-skeleton-button-sm {
+    --ant-control-height-sm: 20px;
+    min-width: revert;
+}
+
+/**
+==========================================
+Rotate animation
+==========================================
+*/
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/**
+==========================================
+Collapsible Panel
+==========================================
+*/
+#root .gf-collapsible-panel .ant-collapse-header,
+#root .gf-collapsible-panel .ant-collapse-content-box {
+    padding: 0;
+}
+
+#root .gf-collapsible-panel .ant-collapse-header {
+    align-items: center;
+}

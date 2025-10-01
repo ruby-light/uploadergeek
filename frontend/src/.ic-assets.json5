@@ -1,6 +1,0 @@
-[
-    {
-        "match": "**/*",
-        "allow_raw_access": true
-    },
-]
