@@ -2,7 +2,7 @@ pub fn caller_is_governance_user() -> Result<(), String> {
     if crate::read_state(|state| state.caller_is_governance_user()) {
         Ok(())
     } else {
-        Err("Caller is governance user".to_owned())
+        Err("Caller is not governance user".to_owned())
     }
 }
 
