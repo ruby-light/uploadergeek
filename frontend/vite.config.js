@@ -34,7 +34,7 @@ export default defineConfig(({mode}) => {
             target: 'es2020',
             outDir,
             emptyOutDir: true,
-            sourcemap: !isDev,
+            sourcemap: false, //!isDev,
             assetsInlineLimit: 1024 * 4, //4kb
             rollupOptions: {
                 output: {
