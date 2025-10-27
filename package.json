@@ -5,6 +5,8 @@
     "scripts": {
         "format": "prettier ./frontend --write",
         "build": "npm run build --workspace=frontend",
+        "build_dev": "npm run build_dev --workspace=frontend",
+        "build_test": "npm run build_test --workspace=frontend",
         "start": "npm run start --workspace=frontend",
         "lint": "npm run lint --workspace=frontend",
         "test": "jest --config=jest.config.ts",

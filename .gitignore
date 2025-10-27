@@ -14,6 +14,7 @@
 
 # rust
 target/
+release/
 
 *.old.did
 

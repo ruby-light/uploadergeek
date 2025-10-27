@@ -4,3 +4,4 @@ pub mod get_governance;
 pub mod get_my_governance_participant;
 pub mod get_proposal;
 pub mod get_proposals;
+pub mod http_request;

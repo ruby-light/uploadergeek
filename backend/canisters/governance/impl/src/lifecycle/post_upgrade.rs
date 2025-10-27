@@ -1,3 +1,4 @@
+use crate::lifecycle::init::init_http_assets;
 use crate::lifecycle::pre_upgrade::StateVersion;
 use crate::model::DataModel;
 use crate::serializer::deserialize;
@@ -23,6 +24,8 @@ fn post_upgrade() {
             canistergeek_ic_rust::logger::post_upgrade_stable_data(logger_stable_data);
         }
     };
+
+    init_http_assets();
 
     log_info!("Governance post-upgrade completed!");
 }

@@ -28,6 +28,8 @@ pem = "3.0.4"
 ring = { version = "0.17.8", features = ["std"] }
 k256 = "0.13.4"
 dirs = "5.0.1"
+include_dir = { version = "0.7", features = ["glob"] }
+ic-http-certification = "3.0.2"
 
 [profile.release]
 lto = true
