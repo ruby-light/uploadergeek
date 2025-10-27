@@ -198,6 +198,31 @@ fn decode_call_response_without_did(raw: &[u8]) -> Result<String, String> {
 
 // #[cfg(test)]
 // mod tests {
+//     use crate::updates::{add_new_proposal::parse_candid, perform_proposal::decode_call_response_with_did};
+
+//     #[test]
+//     fn test() {
+//         let canister_did = r#"
+//             type AccessRight = record {
+//              "#;
+
+//         let raw = vec![
+//             68, 73, 68, 76, 2, 107, 2, 188, 138, 1, 127, 197, 254, 210, 1, 1, 107, 2, 234, 191, 226, 193, 7, 127, 128, 231,
+//             129, 229, 12, 127, 1, 0, 0,
+//         ];
+
+//         let result = decode_call_response_with_did(canister_did, "set_upload_wasm_grant", raw.as_slice());
+//         println!(">>>> result: {result:?}");
+
+//         let candid = r#"
+//             (record{grant = opt record {    operator=principal "6cbt4-ztfyf-7ldym-o2owg-geomw-bkgiy-uuzey-dq4ad-hsly3-txpo7-3qe";    wasm_length=7038831:nat;}})
+//             "#;
+//         let result = parse_candid(candid);
+//         println!(">>>> result: {result:?}");
+//     }
+// }
+// #[cfg(test)]
+// mod tests {
 //     // use candid::Decode;
 //     // use uploader_canister::types::WasmProperties;
 //
