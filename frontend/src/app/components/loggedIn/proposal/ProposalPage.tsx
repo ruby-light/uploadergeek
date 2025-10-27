@@ -224,11 +224,11 @@ const ProposalVotingInfoAndControls = (props: {proposal: Proposal}) => {
     const {proposal} = props;
     const {getGovernanceParticipantByPrincipal} = useGovernanceContext();
 
-    const participantName = getGovernanceParticipantByPrincipal(proposal.initiator)?.name;
     return (
         <Flex vertical gap={16}>
             {proposal.voting.votes.length == 0 ? <div>No votes</div> : null}
             {proposal.voting.votes.map((vote: Vote, idx) => {
+                const participantName = getGovernanceParticipantByPrincipal(vote.participant)?.name;
                 return (
                     <>
                         <KeyValueVertical

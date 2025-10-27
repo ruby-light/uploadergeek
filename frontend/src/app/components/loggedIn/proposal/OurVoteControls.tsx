@@ -34,7 +34,7 @@ export const OurVoteControls = (props: Props) => {
         return !proposal.voting.votes.some((v) => {
             return v.participant.compareTo(currentPrincipal) === 'eq';
         });
-    }, [proposal.voting.votes, currentPrincipal]);
+    }, [currentPrincipal, proposal.state, proposal.voting.votes]);
 
     const {inProgress} = feature.status;
 

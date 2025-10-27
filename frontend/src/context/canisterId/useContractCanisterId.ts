@@ -30,6 +30,14 @@ export const useContractCanisterId = () => {
                     const call = safeCall(fetch, {logger: apiLogger, logMessagePrefix});
                     const response = await call('/get_canister_id');
                     if (hasProperty(response, 'Ok')) {
+                        // if (IS_DEV_ENVIRONMENT) {
+                        //     setCurrentCanister(Principal.fromText('lz3um-vp777-77777-aaaba-cai'));
+                        //     updateFeature({
+                        //         status: {inProgress: false, loaded: true},
+                        //         error: {isError: false, error: undefined}
+                        //     });
+                        //     return;
+                        // }
                         const canisterId = await response.Ok.text();
                         apiLogger.log(`${logMessagePrefix} result`, {canisterId});
                         if (isCanisterPrincipalValid(canisterId)) {
