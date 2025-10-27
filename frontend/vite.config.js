@@ -18,12 +18,7 @@ export default defineConfig(({mode}) => {
     const projectRootFolderPath = path.resolve(__dirname, basePathToRoot);
     const env = loadEnv(mode, projectRootFolderPath, ['VITE_']);
 
-    const envVars = {
-        BACKEND_CANISTER_ID: env.VITE_APP_BACKEND_CANISTER_ID
-    };
-    if (envVars.BACKEND_CANISTER_ID == undefined) {
-        throw new Error(`Vite[${canisterName}] VITE_APP_BACKEND_CANISTER_ID is not defined in ".env*" file.`);
-    }
+    const envVars = {};
     if (env.VITE_APP_INTERNET_IDENTITY_URL != undefined) {
         envVars['INTERNET_IDENTITY_URL'] = env.VITE_APP_INTERNET_IDENTITY_URL;
     }

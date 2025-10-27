@@ -1,3 +1,4 @@
+import {isNullish} from '@dfinity/utils';
 import {type PropsWithChildren, useEffect} from 'react';
 import {AnonymousLoginPage} from '../app/components/anonymous/AnonymousLoginPage';
 import {GovernancePreloader} from '../app/components/loggedIn/GovernancePreloader';
@@ -5,6 +6,7 @@ import {AgentProvider} from '../context/agent/AgentProvider';
 import {AppConfigProvider} from '../context/AppConfigProvider';
 import {AuthProvider, useAuthContext} from '../context/auth/AuthProvider';
 import {CanisterProvider} from '../context/canister/CanisterProvider';
+import {CurrentCanisterIdProvider, useCurrentCanisterIdContext} from '../context/canisterId/CurrentCanisterIdProvider';
 import {DelegationExpirationLogger} from '../context/DelegationExpirationLogger';
 import {GovernanceProvider} from '../context/governance/GovernanceProvider';
 import {MyGovernanceParticipantProvider} from '../context/governance/myGovernanceParticipant/MyGovernanceParticipantProvider';
@@ -16,6 +18,7 @@ import {IS_DEBUG_ENABLED} from '../utils/env';
 import {MyGovernanceParticipantPreloader} from './pages/common/stub/MyGovernanceParticipantPreloader';
 import {SkeletonContentEntryPoint} from './pages/skeleton/SkeletonContentEntryPoint';
 import {SkeletonToolbarEntryPoint} from './pages/skeleton/SkeletonToolbarEntryPoint';
+import {ErrorAlert} from './widgets/alert/ErrorAlert';
 import {ErrorBoundaryComponent} from './widgets/ErrorBoundaryComponent';
 import {PageLoaderComponent} from './widgets/PageLoaderComponent';
 
@@ -51,14 +54,32 @@ const DataComponents = (props: PropsWithChildren) => {
         return <AnonymousLoginPage />;
     }
     return (
-        <MyGovernanceParticipantProvider key={currentPrincipalText}>
-            <MyGovernanceParticipantPreloader />
-            <GovernanceProvider>
-                <GovernancePreloader />
-                {props.children}
-            </GovernanceProvider>
-        </MyGovernanceParticipantProvider>
+        <CurrentCanisterIdProvider>
+            <CurrentCanisterIdPreloader>
+                <MyGovernanceParticipantProvider key={currentPrincipalText}>
+                    <MyGovernanceParticipantPreloader />
+                    <GovernanceProvider>
+                        <GovernancePreloader />
+                        {props.children}
+                    </GovernanceProvider>
+                </MyGovernanceParticipantProvider>
+            </CurrentCanisterIdPreloader>
+        </CurrentCanisterIdProvider>
     );
+};
+
+const CurrentCanisterIdPreloader = (props: PropsWithChildren) => {
+    const {currentCanisterId, feature} = useCurrentCanisterIdContext();
+
+    if (!feature.status.loaded) {
+        return <PageLoaderComponent />;
+    }
+
+    if (isNullish(currentCanisterId)) {
+        return <ErrorAlert message="Unable to load canister information." />;
+    }
+
+    return props.children;
 };
 
 const AppRootLayout = () => {
