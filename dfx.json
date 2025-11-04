@@ -1,47 +1,37 @@
 {
-  "canisters": {
-    "uploader": {
-      "candid": "backend/canisters/uploader/api/can.did",
-      "package": "uploader_canister_impl",
-      "type": "rust"
+    "canisters": {
+        "uploader": {
+            "candid": "backend/canisters/uploader/api/can.did",
+            "package": "uploader_canister_impl",
+            "type": "rust"
+        },
+        "governance": {
+            "candid": "backend/canisters/governance/api/can.did",
+            "package": "governance_canister_impl",
+            "type": "rust"
+        },
+        "internet_identity": {
+            "type": "custom",
+            "candid": "backend/dev/internet_identity/internet_identity.did",
+            "wasm": "backend/dev/internet_identity/internet_identity.wasm",
+            "build": "./bin/build_internet_identity.sh"
+        }
     },
-    "governance": {
-      "candid": "backend/canisters/governance/api/can.did",
-      "package": "governance_canister_impl",
-      "type": "rust"
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
     },
-    "governance_frontend_debug": {
-      "__comment__": "Governance frontend debug build (on localhost or network=ic with debug)",
-      "frontend": {
-        "entrypoint": "frontend/src/index.html"
-      },
-      "source": [
-        "dist/governance_frontend_debug/"
-      ],
-      "type": "assets"
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8080",
+            "type": "ephemeral",
+            "replica": {
+                "subnet_type": "system"
+            }
+        }
     },
-    "internet_identity": {
-      "type": "custom",
-      "candid": "backend/dev/internet_identity/internet_identity.did",
-      "wasm": "backend/dev/internet_identity/internet_identity.wasm",
-      "build": "./bin/build_internet_identity.sh"
-    }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
-    }
-  },
-  "networks": {
-    "local": {
-      "bind": "127.0.0.1:8080",
-      "type": "ephemeral",
-      "replica": {
-        "subnet_type": "system"
-      }
-    }
-  },
-  "dfx": "0.29.1",
-  "version": 1
+    "dfx": "0.29.1",
+    "version": 1
 }
