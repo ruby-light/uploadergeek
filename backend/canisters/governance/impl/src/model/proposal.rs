@@ -34,7 +34,7 @@ impl ProposalStorage {
         self.proposals_table.insert(proposal_id, proposal);
     }
 
-    pub(crate) fn get_proposals_iter(&self) -> Iter<ProposalId, Proposal> {
+    pub(crate) fn get_proposals_iter(&self) -> Iter<'_, ProposalId, Proposal> {
         self.proposals_table.iter()
     }
 }
