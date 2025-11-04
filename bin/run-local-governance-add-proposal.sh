@@ -6,7 +6,7 @@ set -euo pipefail
 NETWORK_ALIAS=local
 IDENTITY=rubysparklabs
 
-PRINCIPAL="jwpmd-3t5iy-5yyxk-iq2mr-ukyje-yzatw-kspmh-io23i-hb3kn-5lnzs-rqe"
+PRINCIPAL="cj6fo-hpd5c-pmcgp-i3vro-a3gom-yn5ny-2b67q-nh2gs-gvp7f-k6734-3ae"
 
 header "Create governance proposal to add '${PRINCIPAL}' in network '${NETWORK_ALIAS}' using identity '${IDENTITY}'"
 

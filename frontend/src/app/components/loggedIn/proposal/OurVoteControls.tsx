@@ -1,5 +1,5 @@
 import {isNullish, nonNullish} from '@dfinity/utils';
-import {Button, Popconfirm, Space} from 'antd';
+import {Button, Flex, Popconfirm} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
 import {ErrorAlert} from 'frontend/src/components/widgets/alert/ErrorAlert';
 import {ErrorMessageText} from 'frontend/src/components/widgets/alert/ErrorMessageText';
@@ -65,27 +65,29 @@ export const OurVoteControls = (props: Props) => {
                 />
             ) : null;
         return (
-            <Space>
+            <Flex gap={8} align="center">
                 <Popconfirm
                     title="Are you sure to vote YES?"
+                    disabled={inProgress}
                     okButtonProps={{loading: inProgress, disabled: inProgress}}
-                    cancelButtonProps={{loading: inProgress, disabled: inProgress}}
+                    cancelButtonProps={{disabled: inProgress}}
                     onConfirm={() => sendVote(true)}>
-                    <Button color="green" variant="solid">
+                    <Button color="green" variant="solid" disabled={inProgress}>
                         Approve
                     </Button>
                 </Popconfirm>
                 <Popconfirm
                     title="Are you sure to vote NO?"
+                    disabled={inProgress}
                     okButtonProps={{loading: inProgress, disabled: inProgress}}
-                    cancelButtonProps={{loading: inProgress, disabled: inProgress}}
+                    cancelButtonProps={{disabled: inProgress}}
                     onConfirm={() => sendVote(false)}>
-                    <Button color="red" variant="solid">
+                    <Button color="red" variant="solid" disabled={inProgress}>
                         Decline
                     </Button>
                 </Popconfirm>
                 {errorPanel}
-            </Space>
+            </Flex>
         );
     }
     return null;

@@ -382,7 +382,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
                         </Col>
                         <Col span={24}>
                             <Form.Item label="Description" name="description">
-                                <Input.TextArea />
+                                <Input.TextArea rows={3} />
                             </Form.Item>
                         </Col>
                         <Col span={24}>

@@ -1,6 +1,6 @@
 import {RocketOutlined} from '@ant-design/icons';
 import {nonNullish} from '@dfinity/utils';
-import {Button, Popconfirm, Space} from 'antd';
+import {Button, Flex, Popconfirm} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
 import {ErrorAlert} from 'frontend/src/components/widgets/alert/ErrorAlert';
 import {ErrorMessageText} from 'frontend/src/components/widgets/alert/ErrorMessageText';
@@ -32,7 +32,10 @@ export const OurPerformControls = (props: Props) => {
         const requestArgs: GetProposalArgs = {
             proposal_id: proposalId
         };
-        const response = await call([requestArgs], {logger: apiLogger, logMessagePrefix: 'performProposal:'});
+        const response = await call([requestArgs], {
+            logger: apiLogger,
+            logMessagePrefix: 'performProposal:'
+        });
         if (hasProperty(response, 'Ok')) {
             PubSub.publish(FETCH_PROPOSAL_NOTIFICATION);
             PubSub.publish(FETCH_CURRENT_GOVERNANCE_NOTIFICATION);
@@ -68,17 +71,18 @@ export const OurPerformControls = (props: Props) => {
         ) : null;
 
     return (
-        <Space>
+        <Flex gap={8} align="center">
             <Popconfirm
                 title="Are you sure to perform?"
+                disabled={inProgress}
                 okButtonProps={{loading: inProgress, disabled: inProgress}}
-                cancelButtonProps={{loading: inProgress, disabled: inProgress}}
+                cancelButtonProps={{disabled: inProgress}}
                 onConfirm={() => sendPerform()}>
-                <Button icon={<RocketOutlined />} color="blue" variant="solid">
+                <Button icon={<RocketOutlined />} color="blue" variant="solid" disabled={inProgress}>
                     Perform
                 </Button>
             </Popconfirm>
             {errorPanel}
-        </Space>
+        </Flex>
     );
 };

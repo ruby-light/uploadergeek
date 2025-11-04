@@ -203,7 +203,7 @@ const ProposalCallCanisterAdditionalInfo = (props: {proposal: Proposal; task: Ca
                 <Flex vertical gap={8}>
                     <KeyValueVertical label="Canister ID" value={<CopyableUIDComponent uid={task.canister_id.toText()} />} />
                     <KeyValueVertical label="Method" value={task.method} />
-                    <KeyValueVertical label="Argument Candid" value={<Input.TextArea value={task.argument_candid} size="small" readOnly rows={2} />} />
+                    <KeyValueVertical label="Argument Candid" value={<Input.TextArea value={task.argument_candid} size="small" readOnly rows={5} />} />
                     <KeyValueVertical label="Canister Candid" value={isNullish(canisterDID) ? '-' : <Input.TextArea value={canisterDID} size="small" readOnly rows={2} />} />
                     <KeyValueVertical label="Payment" value={isNullish(payment) ? '-' : payment.toString()} />
                 </Flex>

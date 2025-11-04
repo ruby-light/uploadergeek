@@ -6,7 +6,7 @@ import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGoverna
 import {REFRESH_PROPOSALS_TOPIC} from 'frontend/src/context/governance/proposals/ProposalsProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
-import {isCanisterPrincipalValid} from 'frontend/src/utils/ic/principal';
+import {isPrincipalValid} from 'frontend/src/utils/ic/principal';
 import PubSub from 'pubsub-js';
 import {type FieldData} from 'rc-field-form/lib/interface';
 import type {Reducer} from 'react';
@@ -174,7 +174,7 @@ export const AddProposalCallCanisterModalComponent = (props: Props) => {
                             {
                                 required: true,
                                 validator: (_rule, value) => {
-                                    if (isCanisterPrincipalValid(value)) {
+                                    if (isPrincipalValid(value)) {
                                         return Promise.resolve();
                                     } else {
                                         return Promise.reject('Invalid canister ID');
@@ -185,13 +185,13 @@ export const AddProposalCallCanisterModalComponent = (props: Props) => {
                         <Input />
                     </Form.Item>
                     <Form.Item label="Argument Candid" name="argumentCandid" rules={[{required: true, message: 'Invalid argument candid'}]}>
-                        <Input.TextArea />
+                        <Input.TextArea rows={3} />
                     </Form.Item>
                     <Form.Item label="Canister DID" name="canisterDid" rules={[]}>
-                        <Input.TextArea />
+                        <Input.TextArea rows={3} />
                     </Form.Item>
                     <Form.Item label="Description" name="description">
-                        <Input.TextArea />
+                        <Input.TextArea rows={3} />
                     </Form.Item>
                     <Flex justify="end" gap={8}>
                         <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>

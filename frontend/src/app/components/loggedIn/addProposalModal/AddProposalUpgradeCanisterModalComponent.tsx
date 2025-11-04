@@ -220,10 +220,10 @@ export const AddProposalUpgradeCanisterModalComponent = (props: Props) => {
                         <Input />
                     </Form.Item>
                     <Form.Item label="Argument Candid" name="argumentCandid" rules={[{required: true, message: 'Invalid argument candid'}]}>
-                        <Input.TextArea />
+                        <Input.TextArea rows={3} />
                     </Form.Item>
                     <Form.Item label="Description" name="description">
-                        <Input.TextArea />
+                        <Input.TextArea rows={3} />
                     </Form.Item>
                     <Flex justify="end" gap={8}>
                         <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>
