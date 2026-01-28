@@ -90,7 +90,8 @@ export const ProposalsTable = () => {
             },
             {
                 title: 'Description',
-                render: (record: TableItemType) => fromNullable(record.proposal.description)
+                render: (record: TableItemType) => fromNullable(record.proposal.description),
+                className: 'gf-preLine'
             }
         ];
         return compactArray(array);

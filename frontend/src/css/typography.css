@@ -30,6 +30,10 @@ White Space
     white-space: pre-wrap;
 }
 
+.gf-preLine {
+    white-space: pre-line;
+}
+
 /**
 ==========================================
 Padding, Margin

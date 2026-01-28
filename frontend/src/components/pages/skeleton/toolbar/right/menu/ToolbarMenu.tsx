@@ -8,7 +8,7 @@ import {i18} from 'frontend/src/i18';
 import type {MenuInfo} from 'rc-menu/lib/interface';
 import {useCallback, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import {PATH_GOVERNANCE, PATH_HOME, PATH_PROFILE} from '../../../Router';
+import {PATH_GOVERNANCE, PATH_HOME, PATH_PROFILE, PATH_TOOLS} from '../../../Router';
 
 const menuSignOutKey = 'signOut';
 const menuDarkModeKey = 'darkMode';
@@ -83,6 +83,10 @@ export const ToolbarMenu = () => {
                 },
                 {type: 'divider'},
                 {key: menuDarkModeKey, label: <DarkMode />},
+                {
+                    key: 'tools',
+                    label: <Link to={PATH_TOOLS}>{i18.toolbar.menu.tools}</Link>
+                },
                 {type: 'divider'},
                 {
                     key: menuSignOutKey,
