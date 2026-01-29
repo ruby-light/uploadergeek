@@ -15,6 +15,7 @@ pub struct OperationGrant {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub enum OperationType {
     InstallCode,
+    ReInstallCode,
     UpgradeCode,
 }
 

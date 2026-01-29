@@ -1,11 +1,10 @@
 use crate::guards::caller_is_operator;
-use crate::management::install_canister_code;
 use crate::{log_error, log_info, mutate_state};
 use ic_cdk_macros::update;
 use sha2::Digest;
 use sha2::Sha256;
 use uploader_canister::perform_operation::*;
-use uploader_canister::types::{OperationType, WasmProperties};
+use uploader_canister::types::WasmProperties;
 
 #[update(guard = "caller_is_operator")]
 async fn perform_operation(_args: Args) -> Response {
@@ -31,14 +30,9 @@ async fn perform_operation_int() -> Result<(), PerformOperationError> {
 
     validate_perform_operation(&grant.wasm_properties, &wasm_module)?;
 
-    install_canister_code(
-        matches!(grant.operation_type, OperationType::UpgradeCode),
-        grant.canister_id,
-        wasm_module,
-        grant.arg,
-    )
-    .await
-    .map_err(|reason| PerformOperationError::OperationError { reason })?;
+    crate::management::install_canister_code(grant.operation_type, grant.canister_id, wasm_module, grant.arg)
+        .await
+        .map_err(|reason| PerformOperationError::OperationError { reason })?;
 
     mutate_state(|state| {
         state.model.set_operation_grant(None);

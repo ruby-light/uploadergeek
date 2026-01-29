@@ -22,11 +22,21 @@ async fn perform_call_int(args: PerformCallArgs) -> Result<PerformCallResult, Pe
     let method = args.method;
     let method_args = args.args;
 
-    let result = ic_cdk::api::call::call_raw(canister_id, method.as_str(), method_args, 0)
+    ic_cdk::call::Call::bounded_wait(canister_id, method.as_str())
+        .with_raw_args(method_args.as_slice())
         .await
+        .map(|result| PerformCallResult {
+            result: result.into_bytes(),
+        })
         .map_err(|error| PerformCallError::CallError {
             reason: format!("{error:?}"),
-        })?;
+        })
 
-    Ok(PerformCallResult { result })
+    // let result = ic_cdk::api::call::call_raw(canister_id, method.as_str(), method_args, 0)
+    // .await
+    // .map_err(|error| PerformCallError::CallError {
+    // reason: format!("{error:?}"),
+    // })?;
+    //
+    // Ok(PerformCallResult { result })
 }

@@ -1,3 +1,5 @@
+use ic_cdk::api::msg_caller;
+
 use crate::model::DataModel;
 
 pub struct CanisterState {
@@ -10,14 +12,14 @@ impl CanisterState {
     }
 
     pub fn caller_is_service_principal(&self) -> bool {
-        self.model.is_service_principal(&ic_cdk::caller())
+        self.model.is_service_principal(&msg_caller())
     }
 
     pub fn caller_is_geek_user(&self) -> bool {
-        self.model.is_geek_user(&ic_cdk::caller())
+        self.model.is_geek_user(&msg_caller())
     }
 
     pub fn caller_is_operator(&self) -> bool {
-        self.model.is_operator(&ic_cdk::caller())
+        self.model.is_operator(&msg_caller())
     }
 }

@@ -1,3 +1,5 @@
+use ic_cdk::api::msg_caller;
+
 use crate::model::DataModel;
 
 pub struct CanisterState {
@@ -10,13 +12,13 @@ impl CanisterState {
     }
 
     pub fn caller_is_geek_user(&self) -> bool {
-        self.model.geek_user_storage.is_geek_user(&ic_cdk::caller())
+        self.model.geek_user_storage.is_geek_user(&msg_caller())
     }
 
     pub fn caller_is_governance_user(&self) -> bool {
         self.model
             .governance_storage
-            .get_governance_participant(&ic_cdk::caller())
+            .get_governance_participant(&msg_caller())
             .is_some()
     }
 }

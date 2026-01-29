@@ -1,6 +1,7 @@
 use crate::guards::caller_is_geek_user;
 use crate::{log_error, log_info, mutate_state};
 use candid::Principal;
+use ic_cdk::api::msg_caller;
 use ic_cdk_macros::update;
 use uploader_canister::set_geek_user_principals::*;
 
@@ -38,7 +39,7 @@ fn set_geek_user_principals_int(args: Args) -> Result<String, SetGeekUserPrincip
 }
 
 fn validate_new_principals(new_principals: &[Principal]) -> Result<(), SetGeekUserPrincipalsError> {
-    if new_principals.contains(&ic_cdk::caller()) {
+    if new_principals.contains(&msg_caller()) {
         Ok(())
     } else {
         Err(SetGeekUserPrincipalsError::LoseControlDangerous)

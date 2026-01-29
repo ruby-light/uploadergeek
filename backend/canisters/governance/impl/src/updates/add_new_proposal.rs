@@ -8,6 +8,7 @@ use governance_canister::types::{
     CallCanister, Governance, Proposal, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,
     Voting,
 };
+use ic_cdk::api::msg_caller;
 use ic_cdk_macros::update;
 
 #[update(guard = "caller_is_governance_user")]
@@ -25,7 +26,7 @@ fn add_new_proposal(args: Args) -> Response {
 }
 
 fn add_new_proposal_int(args: AddNewProposalArgs) -> Result<AddNewProposalResult, AddNewProposalError> {
-    let caller = ic_cdk::caller();
+    let caller = msg_caller();
     let proposal_detail = args.proposal_detail;
 
     mutate_state(|state| {

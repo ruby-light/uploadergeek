@@ -3,6 +3,7 @@ use crate::time::get_unix_epoch_time_millis;
 use crate::{log_error, log_info, mutate_state};
 use governance_canister::types::{Proposal, ProposalPermission, ProposalState, ProposalType, Vote, VotingConfig};
 use governance_canister::vote_for_proposal::*;
+use ic_cdk::api::msg_caller;
 use ic_cdk_macros::update;
 
 #[update(guard = "caller_is_governance_user")]
@@ -22,7 +23,7 @@ fn vote_for_proposal(args: Args) -> Response {
 }
 
 fn vote_for_proposal_int(args: VoteForProposalArgs) -> Result<VoteForProposalResult, VoteForProposalError> {
-    let caller = ic_cdk::caller();
+    let caller = msg_caller();
     let proposal_id = args.proposal_id;
     let vote = args.vote;
 

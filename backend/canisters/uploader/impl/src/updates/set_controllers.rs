@@ -1,6 +1,7 @@
 use crate::guards::caller_is_service_principal;
 use crate::{log_error, log_info, management};
 use candid::Principal;
+use ic_cdk::api::canister_self;
 use ic_cdk_macros::update;
 use uploader_canister::set_controllers::*;
 
@@ -34,7 +35,7 @@ async fn set_controllers_int(args: SetControllersArgs) -> Result<String, SetCont
 }
 
 fn validate_new_controllers(new_controllers: &[Principal]) -> Result<(), SetControllersError> {
-    if new_controllers.contains(&ic_cdk::id()) {
+    if new_controllers.contains(&canister_self()) {
         Ok(())
     } else {
         Err(SetControllersError::LoseControllerDangerous)

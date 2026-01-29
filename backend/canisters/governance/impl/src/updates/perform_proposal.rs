@@ -2,12 +2,14 @@ use crate::guards::caller_is_governance_user;
 use crate::time::get_unix_epoch_time_millis;
 use crate::updates::add_new_proposal::parse_candid;
 use crate::{log_error, log_info, mutate_state, read_state};
-use candid::{IDLArgs, TypeEnv};
+use candid::{IDLArgs, Principal, TypeEnv};
 use candid_parser::{check_prog, IDLProg};
 use governance_canister::perform_proposal::*;
 use governance_canister::types::{
     CallCanister, PerformResult, ProposalDetail, ProposalPermission, ProposalState, ProposalType, UpgradeCanister,
 };
+use ic_cdk::api::msg_caller;
+use ic_cdk::call::CallResult;
 use ic_cdk_macros::update;
 use uploader_canister::set_operation_grant::{SetOperationGrantArgs, SetOperationGrantResponse};
 use uploader_canister::types::{OperationGrant, OperationType, WasmProperties};
@@ -29,7 +31,7 @@ async fn perform_proposal(args: Args) -> Response {
 }
 
 async fn perform_proposal_int(args: PerformProposalArgs) -> Result<PerformProposalResult, PerformProposalError> {
-    let caller = ic_cdk::caller();
+    let caller = msg_caller();
     let proposal_id = args.proposal_id;
 
     let proposal_detail = read_state(|state| {
@@ -109,11 +111,11 @@ async fn perform_upgrade_canister(task: &UpgradeCanister) -> Result<(), String> 
         }),
     };
 
-    let result: (SetOperationGrantResponse,) = ic_cdk::api::call::call(task.uploader_id, "set_operation_grant", (args,))
+    let result = call_set_operation_grant(task.uploader_id, args)
         .await
         .map_err(|error| format!("error while perform uploader canister call: {error:?}"))?;
 
-    match result.0 {
+    match result {
         SetOperationGrantResponse::Ok => Ok(()),
         SetOperationGrantResponse::Err(error) => Err(format!(
             "error while perform uploader canister set_operation_grant call: {error:?}"
@@ -121,15 +123,32 @@ async fn perform_upgrade_canister(task: &UpgradeCanister) -> Result<(), String> 
     }
 }
 
+async fn call_set_operation_grant(
+    uploader_canister: Principal,
+    args: SetOperationGrantArgs,
+) -> CallResult<SetOperationGrantResponse> {
+    Ok(ic_cdk::call::Call::bounded_wait(uploader_canister, "set_operation_grant")
+        .with_arg(args)
+        .await?
+        .candid()?)
+}
+
 async fn perform_canister_call(task: &CallCanister) -> Result<Vec<u8>, String> {
     let canister_id = task.canister_id;
     let method = task.method.as_str();
-    let payment = task.payment.unwrap_or(0);
+    let payment = task.payment.unwrap_or(0) as u128;
     let method_args = parse_candid(task.argument_candid.as_str())?;
 
-    ic_cdk::api::call::call_raw(canister_id, method, method_args, payment)
+    ic_cdk::call::Call::bounded_wait(canister_id, method)
+        .with_raw_args(method_args.as_slice())
+        .with_cycles(payment)
         .await
+        .map(|result| result.into_bytes())
         .map_err(|error| format!("error while perform canister call: {error:?}"))
+
+    // ic_cdk::api::call::call_raw(canister_id, method, method_args, payment)
+    // .await
+    // .map_err(|error| format!("error while perform canister call: {error:?}"))
 }
 
 fn decode_call_response(canister_did: &Option<String>, method: &str, raw: Vec<u8>) -> PerformResult {

@@ -2,6 +2,7 @@ use crate::model::DataModel;
 use crate::state::CanisterState;
 use crate::{init_state, log_info, mutate_state};
 use governance_canister::init::Args;
+use ic_cdk::api::canister_self;
 use ic_cdk_macros::init;
 
 use include_dir::{include_dir, Dir};
@@ -25,5 +26,5 @@ fn init(args: Args) {
 static ASSETS_DIR: Dir<'_> = include_dir!("release/frontend");
 
 pub(crate) fn init_http_assets() {
-    common_embed_assets::certify_all_assets(&ASSETS_DIR, Some(ic_cdk::id().to_text().as_str()));
+    common_embed_assets::certify_all_assets(&ASSETS_DIR, Some(canister_self().to_text().as_str()));
 }

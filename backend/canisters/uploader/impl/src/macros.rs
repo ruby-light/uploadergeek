@@ -47,7 +47,7 @@ macro_rules! log_info {
         let message = format!("INFO {message}");
         canistergeek_ic_rust::logger::log_message(message.clone());
         canistergeek_ic_rust::monitor::collect_metrics();
-        ic_cdk::print(message);
+        ic_cdk::api::debug_print(message);
     }}
 }
 
@@ -58,6 +58,6 @@ macro_rules! log_error {
         let message = format!("ERROR {message}");
         canistergeek_ic_rust::logger::log_message(message.clone());
         canistergeek_ic_rust::monitor::collect_metrics();
-        ic_cdk::print(message);
+        ic_cdk::api::debug_print(message);
     }}
 }

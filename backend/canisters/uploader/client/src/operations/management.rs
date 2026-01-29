@@ -6,7 +6,7 @@ use ic_utils::interfaces::ManagementCanister;
 
 const ONE_HUNDRED_TRILLION: u128 = 100_000_000_000_000;
 
-pub fn build_management_canister(agent: &Agent) -> ManagementCanister {
+pub fn build_management_canister<'a>(agent: &'a Agent) -> ManagementCanister<'a> {
     ManagementCanister::create(agent)
 }
 
