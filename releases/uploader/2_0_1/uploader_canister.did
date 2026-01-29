@@ -1,0 +1,197 @@
+type CanisterLogFeature = variant {
+  filterMessageByContains;
+  filterMessageByRegex;
+};
+type CanisterLogMessages = record {
+  data : vec LogMessageData;
+  lastAnalyzedMessageTimeNanos : opt nat64;
+};
+type CanisterLogMessagesInfo = record {
+  features : vec opt CanisterLogFeature;
+  lastTimeNanos : opt nat64;
+  count : nat32;
+  firstTimeNanos : opt nat64;
+};
+type CanisterLogRequest = variant {
+  getMessagesInfo;
+  getMessages : GetLogMessagesParameters;
+  getLatestMessages : GetLatestLogMessagesParameters;
+};
+type CanisterLogResponse = variant {
+  messagesInfo : CanisterLogMessagesInfo;
+  messages : CanisterLogMessages;
+};
+type CanisterMetrics = record { data : CanisterMetricsData };
+type CanisterMetricsData = variant {
+  hourly : vec HourlyMetricsData;
+  daily : vec DailyMetricsData;
+};
+type CollectMetricsRequestType = variant { force; normal };
+type DailyMetricsData = record {
+  updateCalls : nat64;
+  canisterHeapMemorySize : NumericEntity;
+  canisterCycles : NumericEntity;
+  canisterMemorySize : NumericEntity;
+  timeMillis : int;
+};
+type GetCanisterStatusArgs = record { canister_id : principal };
+type GetCanisterStatusError = variant { CallError : record { reason : text } };
+type GetCanisterStatusResponse = variant {
+  Ok : GetCanisterStatusResult;
+  Err : GetCanisterStatusError;
+};
+type GetCanisterStatusResult = record { status : text };
+type GetGeekUserPrincipalsResponse = variant {
+  Ok : GetGeekUserPrincipalsResult;
+};
+type GetGeekUserPrincipalsResult = record {
+  geek_user_principals : vec principal;
+};
+type GetInformationRequest = record {
+  status : opt StatusRequest;
+  metrics : opt MetricsRequest;
+  logs : opt CanisterLogRequest;
+  version : bool;
+};
+type GetInformationResponse = record {
+  status : opt StatusResponse;
+  metrics : opt MetricsResponse;
+  logs : opt CanisterLogResponse;
+  version : opt nat;
+};
+type GetLatestLogMessagesParameters = record {
+  upToTimeNanos : opt nat64;
+  count : nat32;
+  filter : opt GetLogMessagesFilter;
+};
+type GetLogMessagesFilter = record {
+  analyzeCount : nat32;
+  messageRegex : opt text;
+  messageContains : opt text;
+};
+type GetLogMessagesParameters = record {
+  count : nat32;
+  filter : opt GetLogMessagesFilter;
+  fromTimeNanos : opt nat64;
+};
+type GetMetricsParameters = record {
+  dateToMillis : nat;
+  granularity : MetricsGranularity;
+  dateFromMillis : nat;
+};
+type GetServicePrincipalsResponse = variant { Ok : GetServicePrincipalsResult };
+type GetServicePrincipalsResult = record { service_principals : vec principal };
+type HourlyMetricsData = record {
+  updateCalls : vec nat64;
+  canisterHeapMemorySize : vec nat64;
+  canisterCycles : vec nat64;
+  canisterMemorySize : vec nat64;
+  timeMillis : int;
+};
+type LogMessageData = record { timeNanos : nat64; message : text };
+type MetricsGranularity = variant { hourly; daily };
+type MetricsRequest = record { parameters : GetMetricsParameters };
+type MetricsResponse = record { metrics : opt CanisterMetrics };
+type NumericEntity = record {
+  avg : nat64;
+  max : nat64;
+  min : nat64;
+  first : nat64;
+  last : nat64;
+};
+type OperationGrant = record {
+  arg : blob;
+  operation_type : OperationType;
+  operator : principal;
+  canister_id : principal;
+  wasm_properties : WasmProperties;
+};
+type OperationType = variant { UpgradeCode; InstallCode; ReInstallCode };
+type PerformCallArgs = record {
+  method : text;
+  args : blob;
+  canister_id : principal;
+};
+type PerformCallError = variant { CallError : record { reason : text } };
+type PerformCallResult = record { result : blob };
+type PerformOperationError = variant {
+  WrongWasmLength : record { length : nat64 };
+  WrongWasmHash : record { hash : text };
+  OperationError : record { reason : text };
+};
+type PerformOperationResponse = variant { Ok; Err : PerformOperationError };
+type SetControllersArgs = record {
+  controllers : vec principal;
+  canister_id : principal;
+};
+type SetControllersError = variant {
+  LoseControllerDangerous;
+  OperationError : record { reason : text };
+};
+type SetControllersResponse = variant { Ok; Err : SetControllersError };
+type SetGeekUserPrincipalsArgs = record {
+  geek_user_principals : vec principal;
+};
+type SetGeekUserPrincipalsError = variant { LoseControlDangerous };
+type SetGeekUserPrincipalsResponse = variant {
+  Ok;
+  Err : SetGeekUserPrincipalsError;
+};
+type SetOperationGrantArgs = record { grant : opt OperationGrant };
+type SetOperationGrantError = variant { WrongWasmLength };
+type SetOperationGrantResponse = variant {
+  Ok : PerformCallResult;
+  Err : PerformCallError;
+};
+type SetOperationGrantResponse_1 = variant { Ok; Err : SetOperationGrantError };
+type SetServicePrincipalsArgs = record { service_principals : vec principal };
+type SetServicePrincipalsError = variant { LoseControlDangerous };
+type SetServicePrincipalsResponse = variant {
+  Ok;
+  Err : SetServicePrincipalsError;
+};
+type StatusRequest = record {
+  memory_size : bool;
+  cycles : bool;
+  heap_memory_size : bool;
+};
+type StatusResponse = record {
+  memory_size : opt nat64;
+  cycles : opt nat64;
+  heap_memory_size : opt nat64;
+};
+type UpdateInformationRequest = record {
+  metrics : opt CollectMetricsRequestType;
+};
+type UploadWasmChunkArgs = record { first : bool; chunk : blob };
+type UploadWasmChunkError = variant { WasmLengthOverflow };
+type UploadWasmChunkResponse = variant {
+  Ok : UploadWasmChunkResult;
+  Err : UploadWasmChunkError;
+};
+type UploadWasmChunkResult = record { length : nat64 };
+type WasmProperties = record { wasm_length : opt nat64; wasm_hash : text };
+service : {
+  getCanistergeekInformation : (GetInformationRequest) -> (
+      opt GetInformationResponse,
+    ) query;
+  get_canister_status : (GetCanisterStatusArgs) -> (GetCanisterStatusResponse);
+  get_geek_user_principals : (record {}) -> (
+      GetGeekUserPrincipalsResponse,
+    ) query;
+  get_service_principals : (record {}) -> (GetServicePrincipalsResponse) query;
+  perform_call : (PerformCallArgs) -> (SetOperationGrantResponse);
+  perform_operation : (record {}) -> (PerformOperationResponse);
+  set_controllers : (SetControllersArgs) -> (SetControllersResponse);
+  set_geek_user_principals : (SetGeekUserPrincipalsArgs) -> (
+      SetGeekUserPrincipalsResponse,
+    );
+  set_operation_grant : (SetOperationGrantArgs) -> (
+      SetOperationGrantResponse_1,
+    );
+  set_service_principals : (SetServicePrincipalsArgs) -> (
+      SetServicePrincipalsResponse,
+    );
+  updateCanistergeekInformation : (UpdateInformationRequest) -> ();
+  upload_wasm_chunk : (UploadWasmChunkArgs) -> (UploadWasmChunkResponse);
+}

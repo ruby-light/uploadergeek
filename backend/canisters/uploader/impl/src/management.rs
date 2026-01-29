@@ -47,7 +47,7 @@ pub async fn put_wasm_module(canister_id: &Principal, wasm_module: Vec<u8>) -> R
     .await
     .map_err(|error| format!("Error while clearing chunk store: {:?}", error))?;
 
-    let chunk_size = 2_000_000;
+    let chunk_size = 1_000_000;
     let mut from: usize = 0;
     let mut hashes = vec![];
     while from < wasm_module.len() {
