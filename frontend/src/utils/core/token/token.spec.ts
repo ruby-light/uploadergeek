@@ -1,4 +1,5 @@
 import {ICPToken, type Token} from '@dfinity/utils';
+import {describe, expect, test} from 'vitest';
 import {formatNNSTokenAmount, formatTokenAmount, formatTokenAmountWithSymbol} from './token';
 
 const ICP: Token = ICPToken;

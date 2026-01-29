@@ -1,3 +1,4 @@
+import {describe, expect, it} from 'vitest';
 import {toError} from './toError';
 
 describe('toError', () => {
@@ -119,7 +120,7 @@ describe('toError', () => {
     });
 
     it('should handle bigint input', () => {
-        const input = BigInt(123);
+        const input = 123n;
         const result = toError(input);
 
         expect(result).toBeInstanceOf(Error);

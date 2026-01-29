@@ -1,5 +1,4 @@
-import {isNullish} from '@dfinity/utils';
-import type {Token} from '@dfinity/utils/dist/types/parser/token';
+import {isNullish, type Token} from '@dfinity/utils';
 import {formatAtomicAmountRounded} from '../number/atomic/atomic';
 import type {FormatOptions} from '../number/decimal/decimal';
 

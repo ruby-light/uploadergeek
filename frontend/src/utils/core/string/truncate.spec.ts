@@ -1,3 +1,4 @@
+import {describe, expect, it} from 'vitest';
 import {truncateEnd, truncateMiddle} from './truncate';
 
 describe('truncateMiddle', () => {

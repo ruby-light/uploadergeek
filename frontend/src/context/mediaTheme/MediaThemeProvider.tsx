@@ -4,8 +4,19 @@ type ResolvedTheme = 'light' | 'dark';
 type ThemeType = ResolvedTheme | 'system';
 
 type Context = {
+    /**
+     * system theme according to OS settings
+     */
+    systemTheme: ResolvedTheme;
+    /**
+     * controlled theme type
+     */
     type: ThemeType;
+    /**
+     * currently resolved theme
+     */
     resolvedTheme: ResolvedTheme;
+
     setType: (type: ThemeType) => void;
     toggleTheme: () => void;
 };
@@ -38,21 +49,25 @@ type Props = {
 export const MediaThemeProvider = (props: PropsWithChildren<Props>) => {
     const {type, onTypeChange, darkClassName = 'gf-dark', children} = props;
 
+    const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme());
     const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(type));
 
     const toggleTheme = useCallback(() => {
-        onTypeChange(type == 'dark' ? 'light' : 'dark');
-    }, [type, onTypeChange]);
+        onTypeChange(resolvedTheme == 'dark' ? 'light' : 'dark');
+    }, [resolvedTheme, onTypeChange]);
 
     useEffect(() => {
         setResolvedTheme(resolveTheme(type));
 
-        if (type != 'system') {
-            return;
-        }
-
         const mediaQueryList = window.matchMedia(matchMediaDarkConstant);
-        const handler = () => setResolvedTheme(mediaQueryList.matches ? 'dark' : 'light');
+        const handler = () => {
+            const currentTheme = mediaQueryList.matches ? 'dark' : 'light';
+            setSystemTheme(currentTheme);
+
+            if (type === 'system') {
+                setResolvedTheme(currentTheme);
+            }
+        };
 
         mediaQueryList.addEventListener('change', handler);
         return () => {
@@ -66,6 +81,7 @@ export const MediaThemeProvider = (props: PropsWithChildren<Props>) => {
 
     const value = useMemo<Context>(
         () => ({
+            systemTheme,
             type,
             resolvedTheme,
             /**
@@ -74,7 +90,7 @@ export const MediaThemeProvider = (props: PropsWithChildren<Props>) => {
             setType: onTypeChange,
             toggleTheme
         }),
-        [type, resolvedTheme, onTypeChange, toggleTheme]
+        [systemTheme, type, resolvedTheme, onTypeChange, toggleTheme]
     );
 
     return <Context.Provider value={value}>{children}</Context.Provider>;
@@ -92,8 +108,10 @@ const resolveTheme = (type: ThemeType): ResolvedTheme => {
 
 function applyHtmlClass(resolvedTheme: ResolvedTheme, className: string): void {
     if (resolvedTheme == 'dark') {
+        document.documentElement.classList.add(className);
         document.body.classList.add(className);
     } else {
+        document.documentElement.classList.remove(className);
         document.body.classList.remove(className);
     }
 }

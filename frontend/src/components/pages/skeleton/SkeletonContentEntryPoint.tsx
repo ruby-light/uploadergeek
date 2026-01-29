@@ -15,8 +15,7 @@ import {ErrorBoundaryComponent} from '../../widgets/ErrorBoundaryComponent';
 import {AbstractStubPage} from '../../widgets/stub/AbstractStubPage';
 import {GovernancePage} from '../governance/GovernancePage';
 import {ProfilePage} from '../profile/ProfilePage';
-import {ToolsPage} from '../tools/ToolsPage';
-import {PATH_GOVERNANCE, PATH_HOME, PATH_PROFILE, PATH_PROPOSAL, PATH_TOOLS} from './Router';
+import {PATH_GOVERNANCE, PATH_HOME, PATH_PROFILE, PATH_PROPOSAL} from './Router';
 
 export const SkeletonContentEntryPoint = () => {
     return (
@@ -55,14 +54,6 @@ export const SkeletonContentEntryPoint = () => {
                     }
                 />
 
-                <Route
-                    path={PATH_TOOLS}
-                    element={
-                        <RouteContentWrapper childComponentName="Tools">
-                            <ToolsPage />
-                        </RouteContentWrapper>
-                    }
-                />
                 <Route path="*" element={<Navigate to={PATH_HOME} />} />
             </Routes>
         </div>

@@ -1,3 +1,4 @@
+import {describe, expect, test} from 'vitest';
 import {addThousandSeparator, applyDecimalPrecision, formatDecimalString, normalizeInput, roundDecimalString} from './decimal';
 
 describe('roundDecimalString', () => {
@@ -25,7 +26,17 @@ describe('roundDecimalString', () => {
         expect(roundDecimalString('1.00000000', 8)).toBe('1');
     });
 
-    test.each(['abc', '', '-', '1e4', Number.MAX_VALUE, Number.MIN_VALUE, undefined, null, Symbol()])('invalid input: %p → undefined', (input) => {
+    test.each([
+        ['abc', 'abc'],
+        ['', ''],
+        ['-', '-'],
+        ['1e4', '1e4'],
+        [Number.MAX_VALUE, 'Number.MAX_VALUE'],
+        [Number.MIN_VALUE, 'Number.MIN_VALUE'],
+        [undefined, 'undefined'],
+        [null, 'null'],
+        [Symbol(), 'Symbol']
+    ])('invalid input: %s → undefined', (input, _label) => {
         expect(roundDecimalString(input as any, 2)).toBeUndefined();
     });
 });
@@ -54,7 +65,17 @@ describe('formatDecimalString', () => {
         expect(formatDecimalString('1000', {minDecimalPlaces: 3})).toBe('1000.000');
     });
 
-    test.each(['', 'foo', '-', {}, Number.MAX_VALUE, Number.MIN_VALUE, undefined, null, Symbol()])('invalid input: %p → undefined', (input) => {
+    test.each([
+        ['', ''],
+        ['foo', 'foo'],
+        ['-', '-'],
+        [{}, 'object'],
+        [Number.MAX_VALUE, 'Number.MAX_VALUE'],
+        [Number.MIN_VALUE, 'Number.MIN_VALUE'],
+        [undefined, 'undefined'],
+        [null, 'null'],
+        [Symbol(), 'Symbol']
+    ])('invalid input: %s → undefined', (input, _label) => {
         expect(formatDecimalString(input as any)).toBeUndefined();
     });
 });
@@ -106,7 +127,21 @@ describe('normalizeInput', () => {
         expect(normalizeInput('1 000,45')).toEqual({isNegative: false, intPart: '1000', fracPart: '45'});
     });
 
-    test.each(['', 'foo', '-', 'NaN', '1e4', Number.MAX_VALUE, Number.MIN_VALUE, 1e20, BigInt(1e20), undefined, null, Symbol(), Number.POSITIVE_INFINITY])('invalid input: %p → undefined', (input) => {
+    test.each([
+        ['', ''],
+        ['foo', 'foo'],
+        ['-', '-'],
+        ['NaN', 'NaN'],
+        ['1e4', '1e4'],
+        [Number.MAX_VALUE, 'Number.MAX_VALUE'],
+        [Number.MIN_VALUE, 'Number.MIN_VALUE'],
+        [1e20, '1e20'],
+        [BigInt(1e20), 'BigInt'],
+        [undefined, 'undefined'],
+        [null, 'null'],
+        [Symbol(), 'Symbol'],
+        [Number.POSITIVE_INFINITY, 'Infinity']
+    ])('invalid input: %s → undefined', (input, _label) => {
         expect(normalizeInput(input as any)).toBeUndefined();
     });
 });

@@ -1,3 +1,4 @@
+import {describe, expect, test} from 'vitest';
 import {formatAtomicAmount, parseAtomicAmount} from './atomic';
 
 const decimals = 8;
@@ -28,12 +29,28 @@ describe('parseAtomicAmount', () => {
         expect(parseAtomicAmount('0.000000009', decimals)?.toString()).toBe('0');
     });
 
-    test.each(['', ' ', '-', '1.2.3', '1.2,3', '1,2.3', '1,2,3', '1e10', 'abc', Number.MAX_VALUE, Number.MIN_VALUE, undefined, null, {}, Symbol(), NaN, Infinity, -Infinity])(
-        'invalid parsing: %p → undefined',
-        (input) => {
-            expect(parseAtomicAmount(input as any, decimals)).toBeUndefined();
-        }
-    );
+    test.each([
+        ['', ''],
+        [' ', ' '],
+        ['-', '-'],
+        ['1.2.3', '1.2.3'],
+        ['1.2,3', '1.2,3'],
+        ['1,2.3', '1,2.3'],
+        ['1,2,3', '1,2,3'],
+        ['1e10', '1e10'],
+        ['abc', 'abc'],
+        [Number.MAX_VALUE, 'Number.MAX_VALUE'],
+        [Number.MIN_VALUE, 'Number.MIN_VALUE'],
+        [undefined, 'undefined'],
+        [null, 'null'],
+        [{}, 'object'],
+        [Symbol(), 'Symbol'],
+        [NaN, 'NaN'],
+        [Infinity, 'Infinity'],
+        [-Infinity, '-Infinity']
+    ])('invalid parsing: %s → undefined', (input, _label) => {
+        expect(parseAtomicAmount(input as any, decimals)).toBeUndefined();
+    });
 });
 
 describe('formatAtomicAmount', () => {
@@ -68,7 +85,17 @@ describe('formatAtomicAmount', () => {
         expect(formatAtomicAmount(-1n, decimals)).toBe('-0.00000001');
     });
 
-    test.each([undefined, null, 'abc', '1e4', {}, Symbol(), NaN, Infinity, -Infinity])('invalid input: %p → undefined', (input) => {
+    test.each([
+        [undefined, 'undefined'],
+        [null, 'null'],
+        ['abc', 'abc'],
+        ['1e4', '1e4'],
+        [{}, 'object'],
+        [Symbol(), 'Symbol'],
+        [NaN, 'NaN'],
+        [Infinity, 'Infinity'],
+        [-Infinity, '-Infinity']
+    ])('invalid input: %s → undefined', (input, _label) => {
         expect(formatAtomicAmount(input as any, decimals)).toBeUndefined();
     });
 });

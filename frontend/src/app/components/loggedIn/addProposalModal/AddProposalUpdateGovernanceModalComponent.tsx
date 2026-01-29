@@ -4,6 +4,7 @@ import {isEmptyString, nonNullish, toNullable} from '@dfinity/utils';
 import {Button, Card, Col, Flex, Form, Input, InputNumber, Modal, Row, Select, Space} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
+import {RouterPaths} from 'frontend/src/components/pages/skeleton/Router';
 import {REFRESH_PROPOSALS_TOPIC} from 'frontend/src/context/governance/proposals/ProposalsProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
 import type {KeysOfUnion} from 'frontend/src/utils/core/typescript/typescriptAddons';
@@ -13,6 +14,7 @@ import PubSub from 'pubsub-js';
 import type {FieldData} from 'rc-field-form/lib/interface';
 import type {Reducer} from 'react';
 import {useReducer} from 'react';
+import {useNavigate} from 'react-router-dom';
 import type {AddNewProposalArgs, GovernanceParticipant, ProposalDetail, ProposalPermission, ProposalType, VotingConfig} from 'src/declarations/governance/governance.did';
 import type {ModalButtonProps, ModalProps} from '../../common/ModalCommon';
 
@@ -57,6 +59,7 @@ interface Props extends ModalProps {
 
 export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
     const {initialValues} = props;
+    const navigate = useNavigate();
     const {call} = useICCanisterCallGovernance('addNewProposal');
 
     const [form] = useForm<FormValuesType>();
@@ -101,6 +104,7 @@ export const AddProposalUpdateGovernanceModalComponent = (props: Props) => {
         if (hasProperty(response, 'Ok')) {
             PubSub.publish(REFRESH_PROPOSALS_TOPIC);
             props.onDestroy();
+            navigate(RouterPaths.proposal(response.Ok.proposal_id.toString()));
         } else if (hasProperty(response, 'Err')) {
             let localErrorText = errorText;
             if (hasProperty(response.Err, 'NotPermission')) {

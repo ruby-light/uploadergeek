@@ -17,6 +17,7 @@ type Options<T, K extends keyof T> = {
     logger?: Logger;
     logMessagePrefix?: string;
     argsToLog?: Array<any>;
+    resetErrorOnBeforeRequest?: boolean;
     onBeforeRequest?: () => Promise<void>;
     onResponseOkBeforeExit?: (responseOk: MethodResponseTypedOk<T, K>) => Promise<void>;
     onResponseErrorBeforeExit?: (responseError: MethodResponseTypedError<T, K>) => Promise<void>;
@@ -70,12 +71,12 @@ type ICOptions<T, K extends OnlyAsyncMethodNames<T>> = Options<T, K>;
 /**
  * Signature of the "call" function returned by the hook
  */
-export type ICCall<T, K extends OnlyAsyncMethodNames<T>> = (args: ICArgs<T, K>, options?: ICOptions<T, K>) => Promise<ICResponse<T, K>>;
+type ICCall<T, K extends OnlyAsyncMethodNames<T>> = (args: ICArgs<T, K>, options?: ICOptions<T, K>) => Promise<ICResponse<T, K>>;
 
 /**
  * Full return shape of the hook (useful for contexts)
  */
-export type ICHookReturn<T, K extends OnlyAsyncMethodNames<T>> = {
+type ICHookReturn<T, K extends OnlyAsyncMethodNames<T>> = {
     call: ICCall<T, K>;
     data: ICOk<T, K> | undefined;
     setData: Dispatch<ICOk<T, K> | undefined>;
@@ -84,6 +85,7 @@ export type ICHookReturn<T, K extends OnlyAsyncMethodNames<T>> = {
     feature: ReturnType<typeof useFeature>[0];
     updateFeature: ReturnType<typeof useFeature>[1];
     reset: () => void;
+    /* eslint-disable */
     /**
      * @example
      * const myAction = useMemo(
@@ -100,6 +102,7 @@ export type ICHookReturn<T, K extends OnlyAsyncMethodNames<T>> = {
      *        [deps]
      *    );
      */
+    /* eslint-enable */
     wrapWithTryCatch: <X>(action: () => Promise<X>, options?: {logger?: Logger}) => Promise<X | undefined>;
 };
 
@@ -144,7 +147,16 @@ export function useICCallTypedFor<T, K extends OnlyAsyncMethodNames<T>>(getActor
     const call = useCallback(
         async (args: ICArgs<T, K>, options?: ICOptions<T, K>): Promise<ICResponse<T, K>> => {
             try {
-                updateFeature({status: {inProgress: true}});
+                const resetErrorOnBeforeRequest = options?.resetErrorOnBeforeRequest ?? true;
+                if (resetErrorOnBeforeRequest) {
+                    setResponseError(undefined);
+                    updateFeature({
+                        status: {inProgress: true},
+                        error: {isError: false, error: undefined}
+                    });
+                } else {
+                    updateFeature({status: {inProgress: true}});
+                }
 
                 await options?.onBeforeRequest?.();
 

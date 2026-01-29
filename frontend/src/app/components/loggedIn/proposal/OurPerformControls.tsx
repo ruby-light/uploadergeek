@@ -70,15 +70,12 @@ export const OurPerformControls = (props: Props) => {
             />
         ) : null;
 
+    const disabled = inProgress;
+
     return (
         <Flex gap={8} align="center">
-            <Popconfirm
-                title="Are you sure to perform?"
-                disabled={inProgress}
-                okButtonProps={{loading: inProgress, disabled: inProgress}}
-                cancelButtonProps={{disabled: inProgress}}
-                onConfirm={() => sendPerform()}>
-                <Button icon={<RocketOutlined />} color="blue" variant="solid" disabled={inProgress}>
+            <Popconfirm title="Are you sure to perform?" disabled={disabled} okButtonProps={{loading: inProgress, disabled}} cancelButtonProps={{disabled}} onConfirm={() => sendPerform()}>
+                <Button icon={<RocketOutlined />} color="blue" variant="solid" disabled={disabled}>
                     Perform
                 </Button>
             </Popconfirm>

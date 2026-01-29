@@ -8,6 +8,7 @@ import {AuthProvider, useAuthContext} from '../context/auth/AuthProvider';
 import {CanisterProvider} from '../context/canister/CanisterProvider';
 import {CurrentCanisterIdProvider, useCurrentCanisterIdContext} from '../context/canisterId/CurrentCanisterIdProvider';
 import {DelegationExpirationLogger} from '../context/DelegationExpirationLogger';
+import {FaviconMonitor} from '../context/favicon/FaviconMonitor';
 import {GovernanceProvider} from '../context/governance/GovernanceProvider';
 import {MyGovernanceParticipantProvider} from '../context/governance/myGovernanceParticipant/MyGovernanceParticipantProvider';
 import {apiLogger, applicationLogger, authLogger} from '../context/logger/logger';
@@ -39,9 +40,10 @@ export const AppEntryPoint = () => {
 };
 
 const MediaThemeWrapper = (props: PropsWithChildren) => {
-    const {type, setType} = useThemeTypeController('light');
+    const {type, setType} = useThemeTypeController('system');
     return (
         <MediaThemeProvider type={type} onTypeChange={setType} darkClassName="gf-dark">
+            <FaviconMonitor lightIconFileName="/favicon-64.svg" darkIconFileName="/favicon-64-dark.svg" />
             <AppConfigProvider>{props.children}</AppConfigProvider>
         </MediaThemeProvider>
     );

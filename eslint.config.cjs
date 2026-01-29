@@ -3,6 +3,7 @@ const tsParser = require('@typescript-eslint/parser');
 const {fixupConfigRules} = require('@eslint/compat');
 const js = require('@eslint/js');
 const {FlatCompat} = require('@eslint/eslintrc');
+const noCommentedCode = require('eslint-plugin-no-commented-code');
 
 const compat = new FlatCompat({
     baseDirectory: __dirname,
@@ -26,6 +27,9 @@ module.exports = defineConfig([
                 tsconfigRootDir: __dirname
             }
         },
+        plugins: {
+            'no-commented-code': noCommentedCode
+        },
         extends: fixupConfigRules(compat.extends('plugin:react/recommended', 'plugin:react-hooks/recommended', 'plugin:@typescript-eslint/recommended')),
 
         settings: {
@@ -36,8 +40,10 @@ module.exports = defineConfig([
 
         rules: {
             'react/display-name': 'off',
+            'react-hooks/set-state-in-effect': 'off',
             '@typescript-eslint/consistent-type-imports': 'error',
-            '@typescript-eslint/switch-exhaustiveness-check': 'error'
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
+            'react-hooks/exhaustive-deps': 'error'
         }
     },
     {
@@ -46,6 +52,7 @@ module.exports = defineConfig([
         rules: {
             'no-inline-comments': 'warn',
             'no-warning-comments': 'warn',
+            'no-commented-code/no-commented-code': 'warn',
             'react/jsx-curly-brace-presence': [
                 'error',
                 {
@@ -68,7 +75,6 @@ module.exports = defineConfig([
             ],
 
             '@typescript-eslint/no-explicit-any': 'off',
-            '@typescript-eslint/ban-ts-comment': 'off',
             'prefer-spread': 'off',
             'react/react-in-jsx-scope': 'off',
 
@@ -82,5 +88,11 @@ module.exports = defineConfig([
             '@typescript-eslint/await-thenable': 'error'
         }
     },
-    globalIgnores(['bin', '**/node_modules', 'src/declarations', 'release/frontend', '**/eslint.config.cjs', '**/jest.polyfill.js', '**/jest.project.ts', '**/jest.config.ts', '**/vite.config.js'])
+    {
+        files: ['**/*.d.ts'],
+        rules: {
+            'no-commented-code/no-commented-code': 'off'
+        }
+    },
+    globalIgnores(['bin', '**/node_modules', 'src/declarations', 'release/frontend', '**/eslint.config.cjs', '**/vitest.config.ts', '**/vite.config.js'])
 ]);

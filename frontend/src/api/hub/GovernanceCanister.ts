@@ -12,7 +12,11 @@ interface HubCanisterOptions<T> extends Omit<CanisterOptions<T>, 'canisterId'> {
 export class GovernanceCanister extends Canister<HubService> {
     static create(options: HubCanisterOptions<HubService>) {
         const {service, certifiedService, canisterId} = createServices<HubService>({
-            options,
+            options: {
+                ...options,
+                callTransform: undefined,
+                queryTransform: undefined
+            },
             idlFactory,
             certifiedIdlFactory: idlFactory
         });

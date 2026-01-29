@@ -1,4 +1,5 @@
 import {Principal} from '@dfinity/principal';
+import {describe, expect, it} from 'vitest';
 import {jsonStringify} from './json';
 
 describe('jsonStringify', () => {

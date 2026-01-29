@@ -1,11 +1,11 @@
-import {toHexString, uint8ToBuf} from '@dfinity/candid';
-import {fromNullable, isNullish, nonNullish} from '@dfinity/utils';
-import {Flex, Input, Tag, Typography} from 'antd';
+// import {toHexString, uint8ToBuf} from '@dfinity/candid';
+import {fromNullable, isNullish, nonNullish, uint8ArrayToHexString} from '@dfinity/utils';
+import {Flex, Input, Spin, Tag, Typography} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';
 import {ErrorAlert} from 'frontend/src/components/widgets/alert/ErrorAlert';
 import {ErrorMessageText} from 'frontend/src/components/widgets/alert/ErrorMessageText';
 import {CopyableUIDComponent} from 'frontend/src/components/widgets/uid/CopyableUIDComponent';
-import {apiLogger} from 'frontend/src/context/logger/logger';
+import {apiLogger, applicationLogger} from 'frontend/src/context/logger/logger';
 import {arrayToUint8Array} from 'frontend/src/utils/core/array/array';
 import {formatDateAgo} from 'frontend/src/utils/core/date/format';
 import {jsonStringify} from 'frontend/src/utils/core/json/json';
@@ -18,9 +18,10 @@ import {PanelCard} from 'frontend/src/components/widgets/PanelCard';
 import {PanelHeader} from 'frontend/src/components/widgets/PanelHeader';
 import {AbstractStubPage} from 'frontend/src/components/widgets/stub/AbstractStubPage';
 import {i18} from 'frontend/src/i18';
+import {delayPromise} from 'frontend/src/utils/core/promise/promiseUtils';
 import {IS_DEV_ENVIRONMENT} from 'frontend/src/utils/env';
 import PubSub from 'pubsub-js';
-import {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import type {CallCanister, Governance, Proposal, ProposalDetail, ProposalType, UpgradeCanister, Vote} from 'src/declarations/governance/governance.did';
 import {useGovernanceContext} from '../../../../context/governance/GovernanceProvider';
 import {GovernanceInfo} from '../GovernanceInfo';
@@ -37,18 +38,24 @@ export const FETCH_PROPOSAL_NOTIFICATION = 'FETCH_PROPOSAL_NOTIFICATION';
 export const ProposalPage = (props: Props) => {
     const {proposalId} = props;
     const {call, data, feature, responseError} = useICCanisterCallGovernance('getProposal');
-
+    const fetchProposalInProgress = feature.status.inProgress;
+    applicationLogger.log(`ProposalPage: Rendering proposal page for proposalId=${proposalId}`, {fetchProposalInProgress});
     const fetchProposal = useCallback(async () => {
+        const logMessagePrefix = `ProposalPage:getProposal:proposalId=${proposalId}:`;
+        applicationLogger.log(`${logMessagePrefix} Fetching proposal`);
         await call([{proposal_id: BigInt(proposalId)}], {
             logger: apiLogger,
             logMessagePrefix: 'getProposal:',
             onBeforeRequest: async () => {
                 if (IS_DEV_ENVIRONMENT) {
-                    // await delayPromise(1000);
+                    applicationLogger.log(`${logMessagePrefix} Simulating delay before fetching proposal`);
+                    await delayPromise(1000);
+                    applicationLogger.log(`${logMessagePrefix} Delay before fetching proposal completed`);
                     // throw new Error(`Simulated error in dev environment ${Date.now()}`);
                 }
             }
         });
+        applicationLogger.log(`${logMessagePrefix} Fetching proposal completed`);
     }, [call, proposalId]);
 
     useEffect(() => {
@@ -90,7 +97,7 @@ export const ProposalPage = (props: Props) => {
                     <ProposalInfo proposal={data.proposal} />
                 </Flex>
             </PanelCard>
-            <ProposalVotingPanel proposal={data.proposal} />
+            <ProposalVotingPanel proposal={data.proposal} fetchProposalInProgress={fetchProposalInProgress} />
             <ProposalAdditionalInfoPanels proposal={data.proposal} />
         </Flex>
     );
@@ -123,18 +130,18 @@ const ProposalInfo = (props: {proposal: Proposal}) => {
                     </Flex>
                 }
             />
-            <KeyValueVertical label="Description" value={description ?? '-'} />
+            <KeyValueVertical label="Description" value={description ?? '-'} valueClassName="gf-preLine" />
         </Flex>
     );
 };
 
-const ProposalVotingPanel = (props: {proposal: Proposal}) => {
-    const {proposal} = props;
+const ProposalVotingPanel = (props: {proposal: Proposal; fetchProposalInProgress: boolean}) => {
+    const {proposal, fetchProposalInProgress} = props;
     return (
         <PanelCard>
             <Flex vertical gap={16}>
                 <Typography.Title level={5}>Voting</Typography.Title>
-                <ProposalVotingInfoAndControls proposal={proposal} />
+                <ProposalVotingInfoAndControls proposal={proposal} fetchProposalInProgress={fetchProposalInProgress} />
             </Flex>
         </PanelCard>
     );
@@ -220,17 +227,41 @@ const ProposalCallCanisterAdditionalInfo = (props: {proposal: Proposal; task: Ca
     );
 };
 
-const ProposalVotingInfoAndControls = (props: {proposal: Proposal}) => {
-    const {proposal} = props;
-    const {getGovernanceParticipantByPrincipal} = useGovernanceContext();
+const ProposalVotingInfoAndControls = (props: {proposal: Proposal; fetchProposalInProgress: boolean}) => {
+    const {proposal, fetchProposalInProgress} = props;
+
+    const votingControls = !fetchProposalInProgress ? <OurVoteControls proposal={proposal} /> : null;
+    const performControls = !fetchProposalInProgress ? <OurPerformControls proposal={proposal} /> : null;
 
     return (
         <Flex vertical gap={16}>
-            {proposal.voting.votes.length == 0 ? <div>No votes</div> : null}
-            {proposal.voting.votes.map((vote: Vote, idx) => {
+            <Votes votes={proposal.voting.votes} fetchProposalInProgress={fetchProposalInProgress} />
+            {votingControls}
+            {performControls}
+        </Flex>
+    );
+};
+
+const Votes = ({votes, fetchProposalInProgress}: {votes: Array<Vote>; fetchProposalInProgress: boolean}) => {
+    const {getGovernanceParticipantByPrincipal} = useGovernanceContext();
+
+    if (fetchProposalInProgress) {
+        return (
+            <div>
+                <Spin size="small" />
+            </div>
+        );
+    }
+
+    if (votes.length == 0) {
+        return <div>No votes</div>;
+    }
+    return (
+        <div>
+            {votes.map((vote: Vote, idx) => {
                 const participantName = getGovernanceParticipantByPrincipal(vote.participant)?.name;
                 return (
-                    <>
+                    <React.Fragment key={idx}>
                         <KeyValueVertical
                             label={`Vote #${idx + 1}`}
                             gap={8}
@@ -248,12 +279,10 @@ const ProposalVotingInfoAndControls = (props: {proposal: Proposal}) => {
                                 </Flex>
                             }
                         />
-                    </>
+                    </React.Fragment>
                 );
             })}
-            <OurVoteControls proposal={proposal} />
-            <OurPerformControls proposal={proposal} />
-        </Flex>
+        </div>
     );
 };
 
@@ -292,7 +321,7 @@ const ProposalTaskResultInfo = (props: {proposal: Proposal; proposalType: KeysOf
             const {candid, error, response} = result.CallResponse;
             const candidText: string | undefined = fromNullable(candid);
             const errorText: string | undefined = fromNullable(error);
-            const responseText: string = toHexString(uint8ToBuf(arrayToUint8Array(response)));
+            const responseText: string = uint8ArrayToHexString(arrayToUint8Array(response));
             return (
                 <PanelCard>
                     <Flex vertical gap={16}>

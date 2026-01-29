@@ -17,7 +17,7 @@ export const ProposalEntryPoint = () => {
 
     return (
         <>
-            <ProposalPage proposalId={proposalIdNumber} />
+            <ProposalPage proposalId={proposalIdNumber} key={proposalIdNumber} />
         </>
     );
 };

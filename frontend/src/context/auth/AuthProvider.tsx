@@ -1,5 +1,5 @@
 import type {Identity} from '@dfinity/agent';
-import {principalToAccountIdentifier} from '@dfinity/ledger-icp';
+import {principalToAccountIdentifier} from '@dfinity/nns';
 import type {Principal} from '@dfinity/principal';
 import {toError} from 'frontend/src/utils/core/error/toError';
 import type {Logger} from 'frontend/src/utils/logger/Logger';
@@ -25,11 +25,11 @@ type Context = {
 
 const Context = createContext<Context | undefined>(undefined);
 export function useAuthContext() {
-    const ctx = useContext(Context);
-    if (!ctx) {
-        throw new Error('useAuth must be used within <AuthProvider>');
+    const context = useContext(Context);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
     }
-    return ctx;
+    return context;
 }
 
 export function AuthProvider(props: PropsWithChildren<{logger: Logger}>) {
@@ -100,7 +100,7 @@ export function AuthProvider(props: PropsWithChildren<{logger: Logger}>) {
             try {
                 setIsAuthenticating(true);
                 const {identity, authnMethod} = await serviceRef.current!.login(options);
-                logger.debug(`${logMessagePrefix} logged in using`, {authnMethod});
+                logger.debug(`${logMessagePrefix} logged with`, {authnMethod});
                 applyIdentity(identity);
             } catch (e) {
                 logger.error(`${logMessagePrefix} login failed`, toError(e));

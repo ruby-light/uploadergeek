@@ -27,8 +27,8 @@ export function safeCallTyped<F extends (...args: Array<any>) => Promise<any>>(f
     return async (...args: Parameters<F>): Promise<ExtractResponseTyped<F>> => {
         const {logger, logMessagePrefix = 'safeCallTyped:', argsToLog} = options ?? {};
         const reqId = generateUID();
+        const fetchStart = performance.now();
         try {
-            const fetchStart = performance.now();
             logger?.log(`${logMessagePrefix} request`, {reqId}, ...(argsToLog ?? args));
             const response = await fn(...args);
             const fetchDuration = Number.parseFloat((performance.now() - fetchStart).toFixed(2));
@@ -44,7 +44,8 @@ export function safeCallTyped<F extends (...args: Array<any>) => Promise<any>>(f
             throw new Error('unknownResponse');
         } catch (e) {
             const error = toError(e);
-            logger?.error(caughtErrorMessage(logMessagePrefix), error, {reqId});
+            const fetchDuration = Number.parseFloat((performance.now() - fetchStart).toFixed(2));
+            logger?.error(caughtErrorMessage(logMessagePrefix), `[${fetchDuration}ms]`, error, {reqId});
             return {Thrown: error} as ExtractResponseTyped<F>;
         }
     };
@@ -63,8 +64,8 @@ export function safeCall<F extends (...args: Array<any>) => Promise<any>>(fn: F,
     return async (...args: Parameters<F>): Promise<ExtractResponse<F>> => {
         const {logger, logMessagePrefix = 'safeCall:', argsToLog} = options ?? {};
         const reqId = generateUID();
+        const start = performance.now();
         try {
-            const start = performance.now();
             logger?.log(`${logMessagePrefix} request`, {reqId}, ...(argsToLog ?? args));
             const result = await fn(...args);
             const duration = Number.parseFloat((performance.now() - start).toFixed(2));
@@ -72,7 +73,8 @@ export function safeCall<F extends (...args: Array<any>) => Promise<any>>(fn: F,
             return {Ok: result} as ExtractResponse<F>;
         } catch (e) {
             const error = toError(e);
-            logger?.log(caughtErrorMessage(logMessagePrefix), error, {reqId});
+            const duration = Number.parseFloat((performance.now() - start).toFixed(2));
+            logger?.error(caughtErrorMessage(logMessagePrefix), `[${duration}ms]`, error, {reqId});
             return {Thrown: error} as ExtractResponse<F>;
         }
     };

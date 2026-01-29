@@ -4,6 +4,7 @@ import {PanelCard} from 'frontend/src/components/widgets/PanelCard';
 import {CopyableUIDComponent} from 'frontend/src/components/widgets/uid/CopyableUIDComponent';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 import type {ReactNode} from 'react';
+import React from 'react';
 import type {Governance, GovernanceParticipant} from 'src/declarations/governance/governance.did';
 
 export const GovernanceInfo = (props: {governance: Governance; title: ReactNode; titleLevel?: 4 | 5}) => {
@@ -57,8 +58,8 @@ const GovernanceParticipants = (props: {governance: Governance}) => {
                     const principal = value[0];
                     const participant: GovernanceParticipant = value[1];
                     return (
-                        <>
-                            <Flex vertical gap={8} key={idx}>
+                        <React.Fragment key={idx}>
+                            <Flex vertical gap={8}>
                                 <KeyValueVertical
                                     label="Participant"
                                     value={
@@ -88,7 +89,7 @@ const GovernanceParticipants = (props: {governance: Governance}) => {
                                 })}
                             </Flex>
                             <Divider size="small" />
-                        </>
+                        </React.Fragment>
                     );
                 })}
             </Flex>

@@ -44,7 +44,10 @@ export const OurVoteControls = (props: Props) => {
                 vote: vote,
                 proposal_id: proposalId
             };
-            const response = await call([requestArgs], {logger: apiLogger, logMessagePrefix: 'voteForProposal:'});
+            const response = await call([requestArgs], {
+                logger: apiLogger,
+                logMessagePrefix: 'voteForProposal:'
+            });
             if (hasProperty(response, 'Ok')) {
                 PubSub.publish(FETCH_PROPOSAL_NOTIFICATION);
             }
@@ -64,25 +67,18 @@ export const OurVoteControls = (props: Props) => {
                     }
                 />
             ) : null;
+
+        const disabled = inProgress;
+
         return (
             <Flex gap={8} align="center">
-                <Popconfirm
-                    title="Are you sure to vote YES?"
-                    disabled={inProgress}
-                    okButtonProps={{loading: inProgress, disabled: inProgress}}
-                    cancelButtonProps={{disabled: inProgress}}
-                    onConfirm={() => sendVote(true)}>
-                    <Button color="green" variant="solid" disabled={inProgress}>
+                <Popconfirm title="Are you sure to vote YES?" disabled={disabled} okButtonProps={{loading: inProgress, disabled}} cancelButtonProps={{disabled}} onConfirm={() => sendVote(true)}>
+                    <Button color="green" variant="solid" disabled={disabled}>
                         Approve
                     </Button>
                 </Popconfirm>
-                <Popconfirm
-                    title="Are you sure to vote NO?"
-                    disabled={inProgress}
-                    okButtonProps={{loading: inProgress, disabled: inProgress}}
-                    cancelButtonProps={{disabled: inProgress}}
-                    onConfirm={() => sendVote(false)}>
-                    <Button color="red" variant="solid" disabled={inProgress}>
+                <Popconfirm title="Are you sure to vote NO?" disabled={disabled} okButtonProps={{loading: inProgress, disabled}} cancelButtonProps={{disabled}} onConfirm={() => sendVote(false)}>
+                    <Button color="red" variant="solid" disabled={disabled}>
                         Decline
                     </Button>
                 </Popconfirm>

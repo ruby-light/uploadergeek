@@ -1,4 +1,5 @@
-import {sumOfBigintsIfAllDefined} from './calculation';
+import {describe, expect, it} from 'vitest';
+import {calculatePercentageDifferenceUnsafe, sumOfBigintsIfAllDefined} from './calculation';
 
 describe('calculation utilities', () => {
     describe('sumOfBigintsIfAllDefined', () => {
@@ -26,6 +27,21 @@ describe('calculation utilities', () => {
             const large1 = 123456789012345678901234567890n;
             const large2 = 987654321098765432109876543210n;
             expect(sumOfBigintsIfAllDefined(large1, large2)).toBe(large1 + large2);
+        });
+    });
+
+    describe('calculatePercentageDifferenceUnsafe', () => {
+        it('should calculate percentage difference correctly', () => {
+            expect(calculatePercentageDifferenceUnsafe(120n, 100n, 2)).toBe(20.0);
+            expect(calculatePercentageDifferenceUnsafe(67n, 111n, 2)).toBe(-39.63);
+            expect(calculatePercentageDifferenceUnsafe(100n, 100n, 2)).toBe(0.0);
+        });
+
+        it('should return undefined for invalid inputs', () => {
+            expect(calculatePercentageDifferenceUnsafe(-10n, 100n, 2)).toBeUndefined();
+            expect(calculatePercentageDifferenceUnsafe(10n, -100n, 2)).toBeUndefined();
+            expect(calculatePercentageDifferenceUnsafe(10n, 0n, 2)).toBeUndefined();
+            expect(calculatePercentageDifferenceUnsafe(0n, 0n, 2)).toBeUndefined();
         });
     });
 });

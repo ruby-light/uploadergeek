@@ -1,3 +1,4 @@
+import {describe, expect, it} from 'vitest';
 import {isNonEmptyString, trimIfDefined} from './string';
 
 describe('String utilities', () => {

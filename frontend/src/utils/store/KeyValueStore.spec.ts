@@ -1,3 +1,4 @@
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {InMemoryKeyValueStore, LocalStorageKeyValueStore} from './KeyValueStore';
 
 describe('InMemoryKeyValueStore', () => {
@@ -85,17 +86,17 @@ describe('LocalStorageKeyValueStore', () => {
         let store: Record<string, string> = {};
 
         return {
-            getItem: jest.fn((key) => (key in store ? store[key] : null)),
-            setItem: jest.fn((key, value) => {
+            getItem: vi.fn((key: string) => (key in store ? store[key] : null)),
+            setItem: vi.fn((key: string, value: string) => {
                 store[key] = value;
             }),
-            removeItem: jest.fn((key) => {
+            removeItem: vi.fn((key: string) => {
                 delete store[key];
             }),
-            clear: jest.fn(() => {
+            clear: vi.fn(() => {
                 store = {};
             }),
-            key: jest.fn((i) => Object.keys(store)[i] || null),
+            key: vi.fn((i: number) => Object.keys(store)[i] || null),
             get length() {
                 return Object.keys(store).length;
             }

@@ -6,11 +6,13 @@ import {ErrorAlertWithAction} from 'frontend/src/components/widgets/alert/ErrorA
 import {PanelLoadingComponent} from 'frontend/src/components/widgets/PanelLoadingComponent';
 import {useGovernanceContext} from 'frontend/src/context/governance/GovernanceProvider';
 import {useProposalsProviderContext, type RemoteDataItemType} from 'frontend/src/context/governance/proposals/ProposalsProvider';
+import {applicationLogger} from 'frontend/src/context/logger/logger';
 import {prepareTableParamsFiltersFromTableOnChange, prepareTableParamsSortItemsFromTableOnChange, type ListState} from 'frontend/src/hook/useRemoteListWithUrlState';
 import {i18} from 'frontend/src/i18';
 import {compactArray, isEmptyArray} from 'frontend/src/utils/core/array/array';
 import {formatDateAgo} from 'frontend/src/utils/core/date/format';
 import {extractValidPositiveInteger} from 'frontend/src/utils/core/number/transform';
+import {truncateMiddle} from 'frontend/src/utils/core/string/truncate';
 import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {getICFirstKey} from 'frontend/src/utils/ic/did';
 import {useCallback, useMemo} from 'react';
@@ -89,9 +91,13 @@ export const ProposalsTable = () => {
                 )
             },
             {
+                title: 'Context',
+                render: (record: TableItemType) => <Context record={record} />,
+                className: 'gf-noWrap'
+            },
+            {
                 title: 'Description',
-                render: (record: TableItemType) => fromNullable(record.proposal.description),
-                className: 'gf-preLine'
+                render: (record: TableItemType) => <span className="gf-preLine">{fromNullable(record.proposal.description)}</span>
             }
         ];
         return compactArray(array);
@@ -137,5 +143,37 @@ export const ProposalsTable = () => {
         );
     } else {
         return <PanelLoadingComponent message="Loading proposals..." />;
+    }
+};
+
+const Context = ({record}: {record: TableItemType}) => {
+    const {proposal} = record;
+    applicationLogger.debug('ProposalsTable/Context', {record});
+    if (hasProperty(proposal.detail, 'UpgradeCanister')) {
+        return (
+            <Flex vertical gap={8} className="gf-noWrap">
+                <Flex vertical>
+                    <div className="gf-ant-color-secondary">CanisterId</div>
+                    <div>{proposal.detail.UpgradeCanister.task.canister_id.toText()}</div>
+                </Flex>
+                <Flex vertical>
+                    <div className="gf-ant-color-secondary">Wasm</div>
+                    <div>{truncateMiddle(proposal.detail.UpgradeCanister.task.module_hash, 27)}</div>
+                </Flex>
+            </Flex>
+        );
+    } else if (hasProperty(proposal.detail, 'CallCanister')) {
+        return (
+            <Flex vertical gap={8} className="gf-noWrap">
+                <Flex vertical>
+                    <div className="gf-ant-color-secondary">CanisterId</div>
+                    <div>{proposal.detail.CallCanister.task.canister_id.toText()}</div>
+                </Flex>
+                <Flex vertical>
+                    <div className="gf-ant-color-secondary">Method Name</div>
+                    <div>{proposal.detail.CallCanister.task.method}</div>
+                </Flex>
+            </Flex>
+        );
     }
 };

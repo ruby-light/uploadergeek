@@ -8,7 +8,7 @@ export function isEmptyArray<T>(array: Array<T | null | undefined> | null | unde
     return isNullish(array) || array.length == 0;
 }
 
-export const isNonEmptyArray = <T>(array: Array<T | null | undefined> | null | undefined): boolean => {
+export const isNonEmptyArray = <T>(array: Array<T | null | undefined> | null | undefined): array is Array<T | null | undefined> => {
     return !isEmptyArray(array);
 };
 

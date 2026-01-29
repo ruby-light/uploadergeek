@@ -18,6 +18,8 @@ export default defineConfig(({mode}) => {
     const projectRootFolderPath = path.resolve(__dirname, basePathToRoot);
     const env = loadEnv(mode, projectRootFolderPath, ['VITE_']);
 
+    console.log(`Building for mode: ${mode} (isDev: ${isDev})`);
+
     const envVars = {};
     if (env.VITE_APP_INTERNET_IDENTITY_URL != undefined) {
         envVars['INTERNET_IDENTITY_URL'] = env.VITE_APP_INTERNET_IDENTITY_URL;
