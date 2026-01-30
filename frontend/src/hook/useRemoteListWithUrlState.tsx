@@ -5,7 +5,7 @@ import {toError} from 'frontend/src/utils/core/error/toError';
 import {useFeature, type Feature} from 'frontend/src/utils/core/feature/feature';
 import {extractValidPositiveInteger} from 'frontend/src/utils/core/number/transform';
 import {reusePromiseWrapper} from 'frontend/src/utils/core/promise/reusePromise';
-import {isNonEmptyString, trimIfDefined} from 'frontend/src/utils/core/string/string';
+import {isNonEmptyString} from 'frontend/src/utils/core/string/string';
 import type {Logger} from 'frontend/src/utils/logger/Logger';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {caughtErrorMessage} from '../context/logger/loggerConstants';
@@ -20,7 +20,7 @@ type ListFilterValue = Array<string>;
 /**
  * Types for table parameters
  */
-export type ListSortItem = {field: string; order: ListSortOrder};
+type ListSortItem = {field: string; order: ListSortOrder};
 export type ListState = {
     currentPage: number;
     pageSize: number;
@@ -221,7 +221,7 @@ const serializeState = <ExtendedListState extends ListState = ListState>(
     };
 };
 
-export const serializeListSortItem = (item: ListSortItem): string => {
+const serializeListSortItem = (item: ListSortItem): string => {
     return item.order == 'descend' ? `-${item.field}` : item.field;
 };
 
@@ -270,7 +270,7 @@ const deserializeState = <ExtendedListState extends ListState = ListState>(
     } as ExtendedListState;
 };
 
-export const deserializeListSortItem = (sortValue: any, defaultSortItems?: Array<ListSortItem>): Array<ListSortItem> | undefined => {
+const deserializeListSortItem = (sortValue: any, defaultSortItems?: Array<ListSortItem>): Array<ListSortItem> | undefined => {
     return typeof sortValue === 'string'
         ? sortValue.split(',').map((item) => (item.startsWith('-') ? {field: unescape(item.slice(1)), order: 'descend'} : {field: unescape(item), order: 'ascend'}))
         : defaultSortItems?.length
@@ -310,16 +310,4 @@ const normalizeFilters = (filters?: Record<string, ListFilterValue>): Record<str
     });
 
     return Object.keys(normalizedFilters).length > 0 ? normalizedFilters : undefined;
-};
-
-export const getStateSafeValueFromPredefinedArray = <T,>(value_: unknown, validValues: Array<T>): T | undefined => {
-    const value = trimIfDefined(value_);
-    if (isNullish(value)) {
-        return undefined;
-    }
-    const isValidValue = validValues.includes(value as T);
-    if (isValidValue) {
-        return value as T;
-    }
-    return undefined;
 };

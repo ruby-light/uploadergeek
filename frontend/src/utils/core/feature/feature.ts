@@ -36,7 +36,7 @@ export type Feature = {
     error: FError;
 };
 
-export type FeaturePartial = Record_Partial<Feature>;
+type FeaturePartial = Record_Partial<Feature>;
 
 function getDefaultFeature(): Feature {
     return {
@@ -46,26 +46,11 @@ function getDefaultFeature(): Feature {
 }
 export const useFeature = () => useReducer<Reducer<Feature, FeaturePartial>, void>(simpleFeatureReducer, undefined, () => getDefaultFeature());
 
-export type ExtractDataAvailabilityStateByType<T, K extends string> = T extends {type: K} ? Omit<T, 'type'> : never;
-
-export type DataAvailability<TAvailable extends Record<string, any> | never = never, TNotAvailable extends Record<string, any> | never = never, TLoading extends Record<string, any> | never = never> =
-    | ([TAvailable] extends [never] ? {type: 'available'} : {type: 'available'} & TAvailable)
-    | ([TNotAvailable] extends [never] ? {type: 'notAvailable'} : {type: 'notAvailable'} & TNotAvailable)
-    | ([TLoading] extends [never] ? {type: 'loading'} : {type: 'loading'} & TLoading);
-
 /**
 ==========================================
 Reducer
 ==========================================
 */
-
-export function useSimpleReducer<T extends object, TP extends object>(initialState?: T | (() => T)) {
-    return useReducer<Reducer<T, TP>, void>(simpleReducer, undefined, () => (typeof initialState === 'function' ? initialState() : {...initialState}) as T);
-}
-
-function simpleReducer(state: any, newState: any) {
-    return {...state, ...newState};
-}
 
 function simpleFeatureReducer(state: any, newState: any) {
     if (newState == undefined) {

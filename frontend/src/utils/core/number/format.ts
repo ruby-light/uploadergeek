@@ -1,6 +1,5 @@
 import {isNullish} from '@dfinity/utils';
 import {addThousandSeparator, applyDecimalPrecision, formatDecimalString, roundDecimalString, type FormatOptions} from './decimal/decimal';
-import type {ValueWithUnit} from './types';
 
 /**
  * Formats integer and fractional parts into a final string with optional separators and precision.
@@ -20,13 +19,10 @@ export const formatNumber = (value: number | bigint | undefined | null, decimalP
     return formatDecimalString(rounded, {thousandSeparator: ' '});
 };
 
-export type Options = {
+type Options = {
     decimalPlaces?: number;
     unitSpace?: string;
     fallback?: string;
-};
-export const formatValueWithUnit = (valueWithUnit: ValueWithUnit | undefined, options?: Options): string => {
-    return formatNumberWithUnit(valueWithUnit?.value, valueWithUnit?.unit, options);
 };
 
 export const formatNumberWithUnit = (value: number | bigint | undefined, unit: string = '', options?: Options): string => {

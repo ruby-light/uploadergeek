@@ -33,7 +33,7 @@ export const transformICGovernanceToFormValues = (governance: Governance, descri
  * @param {Array<[ProposalType, VotingConfig]>} votingConfiguration
  * @returns {Array<FormValuesTypeVotingConfigElement>}
  */
-export const transformICGovernanceVotingConfigurationToFormValues = (votingConfiguration: Array<[ProposalType, VotingConfig]>): Array<FormValuesTypeVotingConfigElement> => {
+const transformICGovernanceVotingConfigurationToFormValues = (votingConfiguration: Array<[ProposalType, VotingConfig]>): Array<FormValuesTypeVotingConfigElement> => {
     return votingConfiguration.map<FormValuesTypeVotingConfigElement>((votingConfig: [ProposalType, VotingConfig]) => {
         return {
             proposalType: getICFirstKey(votingConfig[0]) as KeysOfUnion<ProposalType>,
@@ -48,7 +48,7 @@ export const transformICGovernanceVotingConfigurationToFormValues = (votingConfi
  * @param {Array<[Principal, GovernanceParticipant]>} participants
  * @returns {Array<FormValuesTypeParticipant>}
  */
-export const transformICGovernanceParticipantsToFormValues = (participants: Array<[Principal, GovernanceParticipant]>): Array<FormValuesTypeParticipant> => {
+const transformICGovernanceParticipantsToFormValues = (participants: Array<[Principal, GovernanceParticipant]>): Array<FormValuesTypeParticipant> => {
     return participants.map<FormValuesTypeParticipant>((participant: [Principal, GovernanceParticipant]) => {
         return {
             principal: participant[0].toString(),

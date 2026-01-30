@@ -13,10 +13,6 @@ export const getCanisterPrincipalIfValid = (principalText: unknown): Principal |
     return undefined;
 };
 
-export const getCanisterPrincipalStringIfValid = (principalText: unknown): string | undefined => {
-    return getCanisterPrincipalIfValid(principalText)?.toText();
-};
-
 const isCanisterPrincipal = (principal: Principal | undefined): boolean => {
     return getPrincipalLastByte(principal) == 1;
 };

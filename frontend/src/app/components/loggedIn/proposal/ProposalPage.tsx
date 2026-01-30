@@ -1,4 +1,3 @@
-// import {toHexString, uint8ToBuf} from '@dfinity/candid';
 import {fromNullable, isNullish, nonNullish, uint8ArrayToHexString} from '@dfinity/utils';
 import {Flex, Input, Spin, Tag, Typography} from 'antd';
 import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGovernance';

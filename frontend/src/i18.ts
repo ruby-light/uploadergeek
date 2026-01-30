@@ -4,22 +4,11 @@ const rawI18 = {
     common: {
         button: {
             cancelButton: 'Cancel',
-            closeButton: 'Close',
-            confirmButton: 'Confirm',
-            backButton: 'Back',
-            retryButton: 'Retry',
-            refreshButton: 'Refresh',
-            howToDoIt: 'How to do it?'
+            submitButton: 'Submit',
+            retryButton: 'Retry'
         },
         error: {
-            unableTo: 'Something went wrong.',
-            processingError: 'Something went wrong. Retrying automatically...',
-            certificateExpirationImminent: 'Certificate is about to expire',
-            inputInvalidAccount: 'Account is not valid',
-            inputInvalidPrincipal: 'Principal is not valid',
-            priceTooLow: 'Price too low.',
-            insufficientBalance: 'Insufficient balance',
-            keyValueFailedToLoad: 'Failed to load'
+            unableTo: 'Something went wrong.'
         },
         vote: {
             approve: 'Approve',
@@ -42,8 +31,7 @@ const rawI18 = {
             home: 'Home',
             governance: 'Governance',
             profile: 'Profile',
-            darkMode: 'Dark Mode',
-            tools: 'Tools'
+            darkMode: 'Dark Mode'
         }
     }
 };

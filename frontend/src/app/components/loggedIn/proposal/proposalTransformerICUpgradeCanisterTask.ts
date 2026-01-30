@@ -1,4 +1,3 @@
-// import {FormValuesType} from "../addProposalModal/AddProposalUpgradeCanisterModalComponent";
 import type {UpgradeCanister} from 'src/declarations/governance/governance.did';
 import type {FormValuesType} from '../addProposalModal/AddProposalUpgradeCanisterModalComponent';
 

@@ -22,7 +22,7 @@ export const GovernanceInfo = (props: {governance: Governance; title: ReactNode;
     );
 };
 
-export const GovernanceVotingConfig = (props: {governance: Governance}) => {
+const GovernanceVotingConfig = (props: {governance: Governance}) => {
     const {governance} = props;
     return (
         <Flex vertical gap={8}>

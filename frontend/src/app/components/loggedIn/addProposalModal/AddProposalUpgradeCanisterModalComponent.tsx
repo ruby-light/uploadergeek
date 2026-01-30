@@ -6,6 +6,7 @@ import {useICCanisterCallGovernance} from 'frontend/src/api/hub/useICCallGoverna
 import {RouterPaths} from 'frontend/src/components/pages/skeleton/Router';
 import {REFRESH_PROPOSALS_TOPIC} from 'frontend/src/context/governance/proposals/ProposalsProvider';
 import {apiLogger} from 'frontend/src/context/logger/logger';
+import {i18} from 'frontend/src/i18';
 import {hasProperty} from 'frontend/src/utils/core/typescript/typescriptAddons';
 import {isCanisterPrincipalValid, isPrincipalValid} from 'frontend/src/utils/ic/principal';
 import PubSub from 'pubsub-js';
@@ -230,10 +231,10 @@ export const AddProposalUpgradeCanisterModalComponent = (props: Props) => {
                     </Form.Item>
                     <Flex justify="end" gap={8}>
                         <Button type="default" onClick={props.onDestroy} disabled={modalButtonProps.ok.loading == true}>
-                            Cancel
+                            {i18.common.button.cancelButton}
                         </Button>
                         <Button type="primary" htmlType="submit" disabled={modalButtonProps.ok.loading == true} loading={modalButtonProps.ok.loading}>
-                            Submit
+                            {i18.common.button.submitButton}
                         </Button>
                     </Flex>
                 </Space>

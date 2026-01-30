@@ -3,7 +3,7 @@ export const parseStringToNumber = (str: string): number | undefined => {
     return Number.isFinite(num) ? num : undefined;
 };
 
-export const isValidPositiveNumber = (num: number): boolean => {
+const isValidPositiveNumber = (num: number): boolean => {
     return Number.isFinite(num) && num >= 0 && num <= Number.MAX_SAFE_INTEGER;
 };
 
@@ -50,50 +50,6 @@ export const extractValidPositiveInteger = (input: unknown, options?: ExtractVal
         if (parsed != undefined && isValidPositiveInteger(parsed)) {
             return parsed;
         }
-    }
-
-    return undefined;
-};
-
-/**
- * Extracts a valid positive bigint from a string input.
- * @param input The input string to extract the bigint from.
- * @returns The extracted bigint if it is valid, otherwise undefined.
- */
-export const extractValidPositiveBigInt = (input: string | undefined): bigint | undefined => {
-    if (input == undefined) {
-        return undefined;
-    }
-
-    /**
-     * Ensure input is a string
-     */
-    if (typeof input !== 'string') {
-        return undefined;
-    }
-
-    /**
-     * Trim spaces and check for valid digits only (no hex, scientific notation, etc.)
-     */
-    input = input.trim();
-    if (!/^\d+$/.test(input)) {
-        return undefined;
-    }
-
-    try {
-        const parsed = BigInt(input);
-
-        /**
-         * Ensure it's non-negative
-         */
-        if (parsed >= 0n) {
-            return parsed;
-        }
-    } catch {
-        /**
-         * Catch any BigInt parsing errors
-         */
-        return undefined;
     }
 
     return undefined;
