@@ -25,3 +25,4 @@ ic-cdk = { workspace = true }
 ic-cdk-macros = { workspace = true }
 include_dir = { workspace = true }
 ic-http-certification = { workspace = true }
+hex = { workspace = true }

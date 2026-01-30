@@ -58,6 +58,34 @@ type DailyMetricsData = record {
   canisterMemorySize : NumericEntity;
   timeMillis : int;
 };
+type DecodeCandidResponseArgs = record {
+  method : text;
+  canister_did : text;
+  response : text;
+};
+type DecodeCandidResponseError = variant {
+  DecodeError : record { error : text };
+  ParseError : record { error : text };
+};
+type DecodeCandidResponseResponse = variant {
+  Ok : DecodeCandidResponseResult;
+  Err : DecodeCandidResponseError;
+};
+type DecodeCandidResponseResult = record { candid : text };
+type EncodeCandidArgsArgs = record { candid : text };
+type EncodeCandidArgsError = variant {
+  DecodeError : record { error : text };
+  ParseError : record { error : text };
+};
+type EncodeCandidArgsResponse = variant {
+  Ok : EncodeCandidArgsResult;
+  Err : EncodeCandidArgsError;
+};
+type EncodeCandidArgsResult = record {
+  hex : text;
+  "blob" : text;
+  slice : blob;
+};
 type GetGeekUserPrincipalsResponse = variant {
   Ok : GetGeekUserPrincipalsResult;
 };
@@ -241,6 +269,10 @@ type VotingConfig = record {
 };
 service : (Args) -> {
   add_new_proposal : (AddNewProposalArgs) -> (AddNewProposalResponse);
+  decode_candid_response : (DecodeCandidResponseArgs) -> (
+      DecodeCandidResponseResponse,
+    );
+  encode_candid_args : (EncodeCandidArgsArgs) -> (EncodeCandidArgsResponse);
   getCanistergeekInformation : (GetInformationRequest) -> (
       opt GetInformationResponse,
     ) query;

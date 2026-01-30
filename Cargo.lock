@@ -959,6 +959,7 @@ dependencies = [
  "canistergeek_ic_rust",
  "common_embed_assets",
  "governance_canister",
+ "hex",
  "ic-cdk 0.19.0",
  "ic-cdk-macros 0.19.0",
  "ic-http-certification",

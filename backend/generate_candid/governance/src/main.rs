@@ -8,6 +8,8 @@ fn main() {
     generate_update_candid_method!(governance_canister, vote_for_proposal);
     generate_update_candid_method!(governance_canister, perform_proposal);
     generate_update_candid_method!(governance_canister, set_geek_user_principals);
+    generate_update_candid_method!(governance_canister, encode_candid_args);
+    generate_update_candid_method!(governance_canister, decode_candid_response);
     generate_update_candid_method!(
         governance_canister,
         update_canistergeek_information,

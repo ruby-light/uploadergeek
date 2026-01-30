@@ -1,3 +1,5 @@
+pub mod decode_candid_response;
+pub mod encode_candid_args;
 pub mod get_canistergeek_information;
 pub mod get_geek_user_principals;
 pub mod get_governance;
