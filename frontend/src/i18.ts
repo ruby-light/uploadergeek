@@ -31,7 +31,8 @@ const rawI18 = {
             home: 'Home',
             governance: 'Governance',
             profile: 'Profile',
-            darkMode: 'Dark Mode'
+            darkMode: 'Dark Mode',
+            tools: 'Tools'
         }
     }
 };
