@@ -93,6 +93,34 @@ export const idlFactory = ({ IDL }) => {
     'Ok' : AddNewProposalResult,
     'Err' : AddNewProposalError,
   });
+  const DecodeCandidResponseArgs = IDL.Record({
+    'method' : IDL.Text,
+    'canister_did' : IDL.Text,
+    'response' : IDL.Text,
+  });
+  const DecodeCandidResponseResult = IDL.Record({ 'candid' : IDL.Text });
+  const DecodeCandidResponseError = IDL.Variant({
+    'DecodeError' : IDL.Record({ 'error' : IDL.Text }),
+    'ParseError' : IDL.Record({ 'error' : IDL.Text }),
+  });
+  const DecodeCandidResponseResponse = IDL.Variant({
+    'Ok' : DecodeCandidResponseResult,
+    'Err' : DecodeCandidResponseError,
+  });
+  const EncodeCandidArgsArgs = IDL.Record({ 'candid' : IDL.Text });
+  const EncodeCandidArgsResult = IDL.Record({
+    'hex' : IDL.Text,
+    'blob' : IDL.Text,
+    'slice' : IDL.Vec(IDL.Nat8),
+  });
+  const EncodeCandidArgsError = IDL.Variant({
+    'DecodeError' : IDL.Record({ 'error' : IDL.Text }),
+    'ParseError' : IDL.Record({ 'error' : IDL.Text }),
+  });
+  const EncodeCandidArgsResponse = IDL.Variant({
+    'Ok' : EncodeCandidArgsResult,
+    'Err' : EncodeCandidArgsError,
+  });
   const StatusRequest = IDL.Record({
     'memory_size' : IDL.Bool,
     'cycles' : IDL.Bool,
@@ -278,6 +306,16 @@ export const idlFactory = ({ IDL }) => {
     'add_new_proposal' : IDL.Func(
         [AddNewProposalArgs],
         [AddNewProposalResponse],
+        [],
+      ),
+    'decode_candid_response' : IDL.Func(
+        [DecodeCandidResponseArgs],
+        [DecodeCandidResponseResponse],
+        [],
+      ),
+    'encode_candid_args' : IDL.Func(
+        [EncodeCandidArgsArgs],
+        [EncodeCandidArgsResponse],
         [],
       ),
     'getCanistergeekInformation' : IDL.Func(

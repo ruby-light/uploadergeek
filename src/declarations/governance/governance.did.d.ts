@@ -54,6 +54,30 @@ export interface DailyMetricsData {
   'canisterMemorySize' : NumericEntity,
   'timeMillis' : bigint,
 }
+export interface DecodeCandidResponseArgs {
+  'method' : string,
+  'canister_did' : string,
+  'response' : string,
+}
+export type DecodeCandidResponseError = {
+    'DecodeError' : { 'error' : string }
+  } |
+  { 'ParseError' : { 'error' : string } };
+export type DecodeCandidResponseResponse = {
+    'Ok' : DecodeCandidResponseResult
+  } |
+  { 'Err' : DecodeCandidResponseError };
+export interface DecodeCandidResponseResult { 'candid' : string }
+export interface EncodeCandidArgsArgs { 'candid' : string }
+export type EncodeCandidArgsError = { 'DecodeError' : { 'error' : string } } |
+  { 'ParseError' : { 'error' : string } };
+export type EncodeCandidArgsResponse = { 'Ok' : EncodeCandidArgsResult } |
+  { 'Err' : EncodeCandidArgsError };
+export interface EncodeCandidArgsResult {
+  'hex' : string,
+  'blob' : string,
+  'slice' : Uint8Array | number[],
+}
 export type GetGeekUserPrincipalsResponse = {
     'Ok' : GetGeekUserPrincipalsResult
   };
@@ -237,6 +261,14 @@ export interface _SERVICE {
   'add_new_proposal' : ActorMethod<
     [AddNewProposalArgs],
     AddNewProposalResponse
+  >,
+  'decode_candid_response' : ActorMethod<
+    [DecodeCandidResponseArgs],
+    DecodeCandidResponseResponse
+  >,
+  'encode_candid_args' : ActorMethod<
+    [EncodeCandidArgsArgs],
+    EncodeCandidArgsResponse
   >,
   'getCanistergeekInformation' : ActorMethod<
     [GetInformationRequest],
